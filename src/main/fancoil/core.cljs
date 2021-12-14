@@ -5,14 +5,15 @@
    [integrant.core :as ig]
    [fancoil.base :as base]
 
-   [fancoil.lib.ratom :as ratom]
    [fancoil.lib.log]
-   [fancoil.lib.fx]))
+   [fancoil.lib.fx]
+   [fancoil.lib.ratom :as lib.ratom]
+   [fancoil.lib.posh :as lib.posh]))
 
 
 (defmethod ig/init-key ::ratom
   [_ config]
-  (ratom/create-ratom config))
+  (lib.ratom/create-ratom config))
 
 
 (defmethod ig/init-key ::tap
