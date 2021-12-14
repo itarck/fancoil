@@ -4,7 +4,7 @@
    [reagent.core :as r]
    [integrant.core :as ig]
    [fancoil.base :as base]
-   [fancoil.plugin.local-storage]
+   
    [fancoil.plugin.ratom]
    [fancoil.plugin.log]
    [fancoil.plugin.fx]))
