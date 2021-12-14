@@ -24,12 +24,11 @@
   (merge-with merge old-config new-config))
 
 
-;; integrant modules
+;; integrant units
 
 (defmethod ig/init-key ::ratom
   [_ config]
   (lib.ratom/create-ratom config))
-
 
 (defmethod ig/init-key ::tap
   [_ config]

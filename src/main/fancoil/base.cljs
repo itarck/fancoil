@@ -1,8 +1,6 @@
 (ns fancoil.base)
 
 
-;; new version
-
 (defmulti tap
   "pure function: tap a model
    value in -> value out
