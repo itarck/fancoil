@@ -1,4 +1,4 @@
-(ns fancoil.plugin.fx
+(ns fancoil.lib.fx
   (:require
    [fancoil.base :as base]))
 

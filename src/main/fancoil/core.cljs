@@ -4,15 +4,16 @@
    [reagent.core :as r]
    [integrant.core :as ig]
    [fancoil.base :as base]
-   
-   [fancoil.plugin.ratom]
-   [fancoil.plugin.log]
-   [fancoil.plugin.fx]))
+
+   [fancoil.lib.ratom :as ratom]
+   [fancoil.lib.log]
+   [fancoil.lib.fx]))
 
 
 (defmethod ig/init-key ::ratom
   [_ config]
-  (r/atom config))
+  (ratom/create-ratom config))
+
 
 (defmethod ig/init-key ::tap
   [_ config]

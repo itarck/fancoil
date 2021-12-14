@@ -1,4 +1,4 @@
-(ns fancoil.plugin.log
+(ns fancoil.lib.log
   (:require 
    [fancoil.base :as base]))
 
