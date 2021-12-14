@@ -1,0 +1,9 @@
+.cpcache
+*.calva-repl
+*.calva/
+output.calva-repl
+*.lock
+.clj-kondo
+.DS_Store
+.lsp
+node_modules
