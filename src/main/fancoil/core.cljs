@@ -19,6 +19,10 @@
           parent parents]
     (derive tag parent)))
 
+(defn merge-config
+  [old-config new-config]
+  (merge-with merge old-config new-config))
+
 
 ;; integrant modules
 
@@ -83,3 +87,27 @@
         (go (handle! signal request))))
     (recur))
   {:event-chan event-chan})
+
+
+;; default config
+
+(def default-config
+  {::ratom {}   
+   ::tap {}
+   ::inject {:ratom (ig/ref ::ratom)} 
+   ::do! {:ratom (ig/ref ::ratom)}  
+   ::doall! {:do! (ig/ref ::do!)}
+   ::handle {:tap (ig/ref ::tap)}
+   ::handle! {:ratom (ig/ref ::ratom)
+              :handle (ig/ref ::handle)
+              :inject (ig/ref ::inject)
+              :do! (ig/ref ::do!)
+              :doall! (ig/ref ::doall!)}
+   ::subscribe {:ratom (ig/ref ::ratom)} 
+   ::view {:dispatch (ig/ref ::dispatch)  
+           :subscribe (ig/ref ::subscribe)}
+   ::chan {}
+   ::dispatch {:event-chan (ig/ref ::chan)}
+   ::service {:handle! (ig/ref ::handle!)
+              :event-chan (ig/ref ::chan)}})
+
