@@ -7,3 +7,5 @@ output.calva-repl
 .DS_Store
 .lsp
 node_modules
+.shadow-cljs
+public/js

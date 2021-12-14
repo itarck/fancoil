@@ -1,13 +1,13 @@
-(ns fancoil.framework
+(ns fancoil.core
   (:require
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [reagent.core :as r]
    [integrant.core :as ig]
    [fancoil.base :as base]
-   [fancoil.lib.local-storage]
-   [fancoil.lib.ratom]
-   [fancoil.lib.log]
-   [fancoil.lib.fx]))
+   [fancoil.plugin.local-storage]
+   [fancoil.plugin.ratom]
+   [fancoil.plugin.log]
+   [fancoil.plugin.fx]))
 
 
 (defmethod ig/init-key ::ratom
