@@ -11,6 +11,17 @@
    [fancoil.lib.posh :as lib.posh]))
 
 
+;; helper functions 
+
+(defn load-hierarchy
+  [hierarchy]
+  (doseq [[tag parents] hierarchy
+          parent parents]
+    (derive tag parent)))
+
+
+;; integrant modules
+
 (defmethod ig/init-key ::ratom
   [_ config]
   (lib.ratom/create-ratom config))
