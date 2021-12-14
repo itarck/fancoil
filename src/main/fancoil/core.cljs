@@ -66,7 +66,9 @@
   [_ {:keys [handle! event-chan]}]
   (go-loop []
     (let [request (<! event-chan)
-          signal (:request/signal request)]
-      (handle! signal request))
+          {:request/keys [signal sync?]} request]
+      (if sync?
+        (handle! signal request)
+        (go (handle! signal request))))
     (recur))
   {:event-chan event-chan})
