@@ -3,13 +3,13 @@
    [fancoil.base :as base]))
 
 
-(defmethod base/do! :dispatch/one
+(defmethod base/do! :dispatch/request
   [{:keys [dispatch]} _ request]
-  (let [{signal :request/signal} request]
-    (dispatch signal request)))
+  (let [{:request/keys [signal event]} request]
+    (dispatch signal event)))
 
-(defmethod base/do! :dispatch/many
+(defmethod base/do! :dispatch/requests
   [{:keys [dispatch]} _ requests]
   (doseq [request requests]
-    (let [{signal :request/signal} request]
-      (dispatch signal request))))
+    (let [{:request/keys [signal event]} request]
+      (dispatch signal event))))

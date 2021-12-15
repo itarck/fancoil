@@ -6,6 +6,7 @@
    [fancoil.base :as base]
 
    [fancoil.lib.log]
+   [fancoil.lib.dispatch]
    [fancoil.lib.fx]
    [fancoil.lib.ratom :as lib.ratom]
    [fancoil.lib.posh :as lib.posh]))
