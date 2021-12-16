@@ -4,6 +4,8 @@ A clojurescript modular framework,  which uses multi-methods to define and imple
 
 ## System structure
 
+![alt text](https://github.com/itarck/fancoil/blob/main/system-structure.jpeg)
+
 * System
     - The system has several machines working together, and it is stateful.
     - The system needs to follow a certain order when starting the machines.
@@ -20,10 +22,10 @@ A clojurescript modular framework,  which uses multi-methods to define and imple
 |---|---|---|---|
 | db | stored state | ref | ratom，datascript |
 | chan | flow state | channel | core.async.chan |
-| subscribe | subscribe reaction, state | ref-> reaction | tree of reactions |
-| view | view model | reactions -> react component | |
+| subscribe | subscribe reaction | ref-> reaction | tree of reactions |
+| view | view model | model -> reactions -> react component | reagent, rum |
 | dispatch | dispatch event | event -> request | |
-| tap | tap model | value->value | User-defined, pure function |
+| tap | tap model | value->value | user-defined, for handle, pure function |
 | handle！ | handle! request | request -> effect | default to db-handler |
 | - inject | inject co-effect | request -> request | support for multiple co-fx |
 | - handle | handle request | request -> response | db-handler, pure function |
