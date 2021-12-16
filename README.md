@@ -1,10 +1,12 @@
 # fancoil
 
-A clojurescript modular framework,  which uses multi-methods to define and implement modules, use integrant to inject configuration and stateful dependencies at system startup.
+A clojurescript modular framework,  which uses multi-methods to define and implement modules, use [integrant] to inject configuration and stateful dependencies at system startup.
+
+[integrant]:https://github.com/weavejester/integrant
 
 ## System structure
 
-![system-chart](https://github.com/itarck/fancoil/blob/main/system-structure.jpeg)
+![system-chart](https://github.com/itarck/fancoil/blob/main/system-structure.jpg)
 
 * System
     - The system has several machines working together, and it is stateful.
@@ -74,12 +76,19 @@ A clojurescript modular framework,  which uses multi-methods to define and imple
 
 ## How to use
 - Read the source code: not much
-- Read the examples:
+- Read some examples: [fancoil-example], includes simple, todomvc, catchat
+
+[fancoil-example]:https://github.com/itarck/fancoil-example
 
 ## Credits and Thanks
-- @richhickey:  multi-method, a powerful runtime polymorphism
-- @weavejester: integrant, an elegant approach to system integration
-- @day8: re-frame, a clear frontend application architecture
+- [@richhickey]:  multi-method, a powerful runtime polymorphism
+- [@weavejester]: [integrant], an elegant approach to system integration
+- [@day8]: [re-frame], a clear frontend application architecture
+
+[@richhickey]:https://github.com/richhickey
+[@weavejester]:https://github.com/weavejester
+[@day8]:https://github.com/day8
+[re-frame]:https://github.com/day8/re-frame
 
 ## Other notes
 - still pre-alpha, fancoil.lib may change, or move to another repo
