@@ -6,8 +6,6 @@
    [fancoil.base :as base]))
 
 
-;; integrant units
-
 (defmethod ig/init-key ::ratom
   [_ config]
   (let [{:keys [initial-value]} config]

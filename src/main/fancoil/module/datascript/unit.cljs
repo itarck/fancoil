@@ -1,10 +1,10 @@
-(ns fancoil.module.datascript.plugin
+(ns fancoil.module.datascript.unit
   (:require
    [datascript.core :as d]
    [integrant.core :as ig]))
 
 
-(defmethod ig/init-key ::datascript [_k config]
+(defmethod ig/init-key :fancoil.module.datascript/unit [_k config]
   (let [{:keys [schema initial-tx initial-db] :or {schema {}}} config
         conn (d/create-conn schema)]
     (when initial-db

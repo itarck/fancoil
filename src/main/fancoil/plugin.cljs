@@ -2,18 +2,15 @@
   (:require
    [fancoil.base :as base]))
 
-
 ;; ratom
 
 (defmethod base/inject :ratom/db
   [{:keys [ratom]} _fn req]
   (assoc req :ratom/db @ratom))
 
-
 (defmethod base/do! :ratom/reset
   [{:keys [ratom]} _ value]
   (reset! ratom value))
-
 
 ;; dispatch 
 
@@ -38,11 +35,9 @@
 
 ;; log
 
-
 (defmethod base/do! :log/out
   [_ _ value]
   (println "log/out: " value))
-
 
 (defmethod base/do! :log/error
   [_ _ value]

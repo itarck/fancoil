@@ -19,7 +19,7 @@
 
 
 (def default-config
-  {::fu/furatom {}   
+  {::fu/ratom {}   
    ::fu/tap {}
    ::fu/inject {:ratom (ig/ref ::fu/ratom)} 
    ::fu/do! {:ratom (ig/ref ::fu/ratom)}  
