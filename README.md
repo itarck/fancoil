@@ -4,7 +4,7 @@ A clojurescript modular framework,  which uses multi-methods to define and imple
 
 ## System structure
 
-![alt text](https://github.com/itarck/fancoil/blob/main/system-structure.jpeg)
+![alt text](https://github.com/itarck/fancoil/blob/main/system-structure.jpeg | width=560)
 
 * System
     - The system has several machines working together, and it is stateful.
