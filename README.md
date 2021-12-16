@@ -1,6 +1,6 @@
 # fancoil
 
-A clojurescript modular framework,  which uses multi-methods to define and implement modules, use [integrant] to inject configuration and stateful dependencies at system startup.
+A clojurescript modular framework, which uses multi-methods to define and implement modules, use [integrant] to inject configuration and stateful dependencies to modules at system startup.
 
 [integrant]:https://github.com/weavejester/integrant
 
@@ -11,7 +11,7 @@ A clojurescript modular framework,  which uses multi-methods to define and imple
 * System
     - The system has several machines working together, and it is stateful.
     - The system needs to follow a certain order when starting the machines.
-* Machine
+* Machine (aka module)
     - Machines have three period: definition, implementation and runtime.
     - When a machine is running, it depends on other machines, and it is stateful.
     - If a machine is not running, it has no state. It is formal function that implements runtime functionality.
