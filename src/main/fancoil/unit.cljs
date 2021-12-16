@@ -3,7 +3,8 @@
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [reagent.core :as r]
    [integrant.core :as ig]
-   [fancoil.base :as base]))
+   [fancoil.base :as base]
+   [fancoil.plugin]))
 
 
 (defmethod ig/init-key ::ratom
