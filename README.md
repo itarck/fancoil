@@ -7,7 +7,7 @@ A clojurescript framework, which uses [multi-methods] to define and implement sy
 
 ## System structure
 
-<img src="https://github.com/itarck/fancoil/blob/main/system-structure.jpg" width="500">
+<img src="https://github.com/itarck/fancoil/blob/main/system-structure.jpg" width="400">
 
 
 ## Concept
@@ -88,7 +88,7 @@ A clojurescript framework, which uses [multi-methods] to define and implement sy
 [fancoil-example]:https://github.com/itarck/fancoil-example
 
 ## Credits and Thanks
-- [@richhickey]:  multi-method, a powerful runtime polymorphism
+- [@richhickey]:  multi-methods, a powerful runtime polymorphism
 - [@weavejester]: [integrant], an elegant approach to system integration
 - [@day8]: [re-frame], a clear frontend application architecture
 
