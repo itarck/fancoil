@@ -12,11 +12,11 @@ It is highly inspired by the structure of [re-frame] and [duct].
 
 Leiningen/Boot
 
-    [com.github.itarck/fancoil "0.0.2-SNAPSHOT"]
+    [com.github.itarck/fancoil "0.0.3-SNAPSHOT"]
 
 Clojure CLI/deps.edn
 
-    com.github.itarck/fancoil {:mvn/version "0.0.2-SNAPSHOT"}
+    com.github.itarck/fancoil {:mvn/version "0.0.3-SNAPSHOT"}
 
 ## System structure
 
