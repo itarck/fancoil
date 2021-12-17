@@ -10,3 +10,4 @@ node_modules
 .shadow-cljs
 public/js
 target
+.lein-repl-history

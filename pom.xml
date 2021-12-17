@@ -17,7 +17,7 @@
     <url>https://github.com/itarck/fancoil</url>
     <connection>scm:git:git://github.com/itarck/fancoil.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/itarck/fancoil.git</developerConnection>
-    <tag>44d406b635380d9f1ba435751f78770a95319330</tag>
+    <tag>cc3eb520ead0720250249a4cb4d4b10bfda3bc08</tag>
   </scm>
   <build>
     <sourceDirectory>src/main</sourceDirectory>
