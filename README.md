@@ -113,6 +113,5 @@ Clojure CLI/deps.edn
 [re-frame]:https://github.com/day8/re-frame
 
 ## Other notes
-- Still pre-alpha, fancoil.module may change, or move to another repo
 - Request is hash-map, open. when injecting cofx, it will add namespaced key of the injector.
 - Response is hash-map, open. doall! can execute all effects, no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, or just use fx/doseq
