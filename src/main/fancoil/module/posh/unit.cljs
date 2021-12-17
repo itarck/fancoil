@@ -2,7 +2,8 @@
   (:require
    [datascript.core :as d]
    [posh.reagent :as p]
-   [integrant.core :as ig]))
+   [integrant.core :as ig]
+   [fancoil.module.posh.plugin]))
 
 (defmethod ig/init-key :fancoil.module.posh/unit [_k config]
   (let [{:keys [schema initial-tx initial-db] :or {schema {}}} config
