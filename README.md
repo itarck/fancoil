@@ -7,7 +7,8 @@ A clojurescript framework, which uses [multi-methods] to define and implement sy
 
 ## System structure
 
-![system-chart](https://github.com/itarck/fancoil/blob/main/system-structure.jpg)
+<img src="https://github.com/itarck/fancoil/blob/main/system-structure.jpg" width="500">
+
 
 ## Concept
 
