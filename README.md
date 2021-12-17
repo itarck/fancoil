@@ -1,5 +1,10 @@
 # fancoil
 
+> What's the frontend of duct?
+>
+> You say air conditioning？ Oh! Fan Coil Unit.
+
+
 A clojurescript framework, which uses [multi-methods] to define and implement system unit, uses [integrant] to inject configuration and stateful dependencies to unit at system startup.
 
 It is highly inspired by the structure of [re-frame] and [duct]. 
@@ -17,6 +22,14 @@ Leiningen/Boot
 Clojure CLI/deps.edn
 
     com.github.itarck/fancoil {:mvn/version "0.0.3-SNAPSHOT"}
+
+## How to use
+- Read the source code: not much, ~100 loc
+- Try some [examples here]: includes simple clock, todomvc-ratom, todomvc-datascript, cat chat (with backend via http and ws) 
+- Read [fancoil.module]
+
+[examples here]:https://github.com/itarck/fancoil-example
+[fancoil.module]:https://github.com/itarck/fancoil.module
 
 ## System structure
 
@@ -94,13 +107,6 @@ Clojure CLI/deps.edn
 - Highly extensible: extend for existing machines via plugins. Or write new integrant unit.
 - Easy to test: use integrant to init parts of the system to do unit tests on the machine
 
-## How to use
-- Read the source code: not much, really
-- Read some basic examples: simple, todomvc-ratom in [examples] 
-- Read some [fancoil.module] examples: todomvc-datascript, catchat (frontend+backend) also in [examples] 
-
-[examples]:https://github.com/itarck/fancoil-example
-[fancoil.module]:https://github.com/itarck/fancoil.module
 
 ## Credits and Thanks
 - [@richhickey]:  multi-methods, a powerful runtime polymorphism
