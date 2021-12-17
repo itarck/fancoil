@@ -1,9 +1,22 @@
 # fancoil
 
-A clojurescript framework, which uses [multi-methods] to define and implement system unit, use [integrant] to inject configuration and stateful dependencies to unit at system startup.
+A clojurescript framework, which uses [multi-methods] to define and implement system unit, uses [integrant] to inject configuration and stateful dependencies to unit at system startup.
+
+It is highly inspired by the structure of [re-frame] and [duct]. 
 
 [integrant]:https://github.com/weavejester/integrant
 [multi-methods]:https://clojure.org/about/runtime_polymorphism
+[duct]:https://github.com/duct-framework/duct
+
+## Installation
+
+Leiningen/Boot
+
+    [com.github.itarck/fancoil "0.0.1-SNAPSHOT"]
+
+Clojure CLI/deps.edn
+
+    com.github.itarck/fancoil {:mvn/version "0.0.1-SNAPSHOT"}
 
 ## System structure
 
@@ -77,12 +90,12 @@ A clojurescript framework, which uses [multi-methods] to define and implement sy
 ## Features
 - Separation of state: stateful dependencies are injected until last minute
 - More functions: more pure or formal functions
-- Highly configurable:  flexibility to change the system structure via integrant config
-- Highly extensible: extend for existing machines via lib/plugins. Or write new integrant modules.
+- Highly configurable: flexibility to change the system structure via integrant config
+- Highly extensible: extend for existing machines via plugins. Or write new integrant unit.
 - Easy to test: use integrant to init parts of the system to do unit tests on the machine
 
 ## How to use
-- Read the source code: not much
+- Read the source code: not much, really
 - Read some examples: [fancoil-example], includes simple, todomvc (ratom/poshed datascript), catchat (frontend+backend)
 
 [fancoil-example]:https://github.com/itarck/fancoil-example
@@ -98,6 +111,6 @@ A clojurescript framework, which uses [multi-methods] to define and implement sy
 [re-frame]:https://github.com/day8/re-frame
 
 ## Other notes
-- still pre-alpha, fancoil.module may change, or move to another repo
-- request is hash-map, open. when injecting cofx, it will add namespaced key of the injector.
-- response is hash-map, open. doall! can execute all effects, no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, or just use fx/doseq
+- Still pre-alpha, fancoil.module may change, or move to another repo
+- Request is hash-map, open. when injecting cofx, it will add namespaced key of the injector.
+- Response is hash-map, open. doall! can execute all effects, no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, or just use fx/doseq
