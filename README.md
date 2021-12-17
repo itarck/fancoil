@@ -36,15 +36,14 @@ It is highly inspired by the structure of [re-frame] and [duct].
 - System
     - The system has several machines working together, and it is stateful.
     - The system needs to follow a certain order when starting the machines.
-- Machine (system unit)
+- Machine (unit)
     - Machines have three period: definition, implementation and runtime.
     - When a machine is running, it depends on other machines, and it is stateful.
     - If a machine is not running, it has no state. It is formal function that implements runtime functionality.
 - Plugin
-	- Plugin can extend functionality of an existing machine
+	- Plugin can extend functionality of a machine
 - Module
-	- Module can extend the system by replacing existing machines or adding new machines to the system
-	- Module include a new machine and plugins for existing machines
+	- Module can extend the system. Module is a package of a new machine and plugins for its related machines
 
 ## Types of machine
 
