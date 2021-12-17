@@ -96,9 +96,11 @@ Clojure CLI/deps.edn
 
 ## How to use
 - Read the source code: not much, really
-- Read some examples: [fancoil-example], includes simple, todomvc (ratom/poshed datascript), catchat (frontend+backend)
+- Read some basic examples: simple, todomvc-ratom in [examples] 
+- Read some [fancoil.module] examples: todomvc-datascript, catchat (frontend+backend) also in [examples] 
 
-[fancoil-example]:https://github.com/itarck/fancoil-example
+[examples]:https://github.com/itarck/fancoil-example
+[fancoil.module]:https://github.com/itarck/fancoil.module
 
 ## Credits and Thanks
 - [@richhickey]:  multi-methods, a powerful runtime polymorphism
