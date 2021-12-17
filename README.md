@@ -1,24 +1,30 @@
 # fancoil
 
-A clojurescript modular framework, which uses multi-methods to define and implement modules, use [integrant] to inject configuration and stateful dependencies to modules at system startup.
+A clojurescript framework, which uses [multi-methods] to define and implement system unit, use [integrant] to inject configuration and stateful dependencies to unit at system startup.
 
 [integrant]:https://github.com/weavejester/integrant
+[multi-methods]:https://clojure.org/about/runtime_polymorphism
 
 ## System structure
 
 ![system-chart](https://github.com/itarck/fancoil/blob/main/system-structure.jpg)
 
-* System
+## Concept
+
+- System
     - The system has several machines working together, and it is stateful.
     - The system needs to follow a certain order when starting the machines.
-* Machine (aka module)
+- Machine (system unit)
     - Machines have three period: definition, implementation and runtime.
     - When a machine is running, it depends on other machines, and it is stateful.
     - If a machine is not running, it has no state. It is formal function that implements runtime functionality.
-* Lib/Plugin
-    - Plugins are ways to extend functionality of a machine
+- Plugin
+	- Plugin can extend functionality of an existing machine
+- Module
+	- Module can extend the system by replacing existing machines or adding new machines to the system
+	- Module include a new machine and plugins for existing machines
 
-## Type of machine
+## Types of machine
 
 | Name | Desc | Spec | Detail |
 |---|---|---|---|
@@ -33,7 +39,7 @@ A clojurescript modular framework, which uses multi-methods to define and implem
 | - handle | handle request | request -> response | db-handler, pure function |
 | - do！ | do! effect | response -> effect | support for multiple fx |
 | service | long-run for request | go-loop | support for sync and async |
-| task | run once | | e.g. init process | |
+| task | once/periodic | | e.g. init process | |
 
 ## Life cycle of machine
 
@@ -45,7 +51,7 @@ A clojurescript modular framework, which uses multi-methods to define and implem
         config: inject, handle, doall!, other resources"
         (fn [config signal & rest] signal))
     ```
-* Implementation period: in fancoil.lib, some methods are already implemented, you can include them. Or you can use defmethod to implement them in your project. Method may call other methods of same multi-fn, as is common in handle and subscribe.
+* Implementation period: in fancoil.plugin, some methods of base are implemented, you can include them. Or you can use defmethod to implement them in your project. Method may call other methods of same multi-fn, as is common in handle and subscribe.
   ``` clojure
   (defmethod base/handle! :default
     [{:keys [doall! handle inject]} signal req]
@@ -53,7 +59,7 @@ A clojurescript modular framework, which uses multi-methods to define and implem
           resp (handle signal req)]
       (doall! resp)))
   ```
-* Runtime period: in fancoil.core, integrant injects config
+* Runtime period: in fancoil.unit, some integrant init-key method is implemented, and integrant will inject the configuration into the machine when it initializes the system
 
   ``` clojure
   (defmethod ig/init-key ::handle!
@@ -76,7 +82,7 @@ A clojurescript modular framework, which uses multi-methods to define and implem
 
 ## How to use
 - Read the source code: not much
-- Read some examples: [fancoil-example], includes simple, todomvc, catchat
+- Read some examples: [fancoil-example], includes simple, todomvc (ratom/poshed datascript), catchat (frontend+backend)
 
 [fancoil-example]:https://github.com/itarck/fancoil-example
 
@@ -91,6 +97,6 @@ A clojurescript modular framework, which uses multi-methods to define and implem
 [re-frame]:https://github.com/day8/re-frame
 
 ## Other notes
-- still pre-alpha, fancoil.lib may change, or move to another repo
-- request is hash-map. when injecting cofx, it will add namespaced key of the injector.
-- response is hash-map. doall! can execute all effects, no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, or just use fx/doseq
+- still pre-alpha, fancoil.module may change, or move to another repo
+- request is hash-map, open. when injecting cofx, it will add namespaced key of the injector.
+- response is hash-map, open. doall! can execute all effects, no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, or just use fx/doseq
