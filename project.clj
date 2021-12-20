@@ -1,4 +1,4 @@
-(defproject com.github.itarck/fancoil "0.0.3-SNAPSHOT"
+(defproject com.github.itarck/fancoil "0.0.4-SNAPSHOT"
   :description "A clojurescript framework, which uses multi-methods to define and implement system unit, uses integrant to inject configuration and stateful dependencies to unit at system startup."
   :url "https://github.com/itarck/fancoil"
   :license {:name "MIT License"

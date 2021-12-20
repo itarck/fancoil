@@ -1,6 +1,6 @@
 {
   "name": "fancoil",
-  "version": "0.0.3-SNAPSHOT",
+  "version": "0.0.4-SNAPSHOT",
   "private": true,
   "devDependencies": {
     "shadow-cljs": "2.16.8"
