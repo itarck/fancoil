@@ -2,6 +2,15 @@
   (:require
    [fancoil.base :as base]))
 
+
+;; handle!
+
+(defmethod base/handle! :default
+  [{:keys [doall! handle inject]} signal req]
+  (let [req (inject :ratom/db req)
+        resp (handle signal req)]
+    (doall! resp)))
+
 ;; ratom
 
 (defmethod base/inject :ratom/db
@@ -42,3 +51,4 @@
 (defmethod base/do! :log/error
   [_ _ value]
   (println "log/error: " value))
+

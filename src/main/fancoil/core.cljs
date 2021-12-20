@@ -19,22 +19,23 @@
 
 
 (def default-config
-  {::fu/ratom {}   
+  {::fu/ratom {}
    ::fu/tap {}
-   ::fu/inject {:ratom (ig/ref ::fu/ratom)} 
-   ::fu/do! {:ratom (ig/ref ::fu/ratom)}  
+   ::fu/inject {:ratom (ig/ref ::fu/ratom)}
+   ::fu/do! {:ratom (ig/ref ::fu/ratom)}
    ::fu/doall! {:do! (ig/ref ::fu/do!)}
    ::fu/handle {:tap (ig/ref ::fu/tap)}
    ::fu/handle! {:ratom (ig/ref ::fu/ratom)
-              :handle (ig/ref ::fu/handle)
-              :inject (ig/ref ::fu/inject)
-              :do! (ig/ref ::fu/do!)
-              :doall! (ig/ref ::fu/doall!)}
-   ::fu/subscribe {:ratom (ig/ref ::fu/ratom)} 
-   ::fu/view {:dispatch (ig/ref ::fu/dispatch)  
-           :subscribe (ig/ref ::fu/subscribe)}
+                 :handle (ig/ref ::fu/handle)
+                 :inject (ig/ref ::fu/inject)
+                 :do! (ig/ref ::fu/do!)
+                 :doall! (ig/ref ::fu/doall!)}
+   ::fu/subscribe {:ratom (ig/ref ::fu/ratom)}
+   ::fu/view {:dispatch (ig/ref ::fu/dispatch)
+              :subscribe (ig/ref ::fu/subscribe)}
    ::fu/chan {}
    ::fu/dispatch {:event-chan (ig/ref ::fu/chan)}
    ::fu/service {:handle! (ig/ref ::fu/handle!)
-              :event-chan (ig/ref ::fu/chan)}})
+                 :event-chan (ig/ref ::fu/chan)}
+   ::fu/cron {:dispatch (ig/ref ::fu/dispatch)}})
 

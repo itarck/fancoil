@@ -47,16 +47,29 @@
   [_ config]
   (partial base/view config))
 
+(defmethod ig/init-key ::cron
+  [_ config]
+  (partial base/cron config))
+
 (defmethod ig/init-key ::chan
   [_ _]
   (chan))
 
 (defmethod ig/init-key ::dispatch
   [_ {:keys [event-chan]}]
-  (fn [signal event]
-    (let [req {:request/signal signal
-               :request/event event}]
-      (go (>! event-chan req)))))
+  (fn dispatch
+    ([signal]
+     (dispatch signal {} {}))
+    ([signal event]
+     (dispatch signal event {:sync? false}))
+    ([signal event args]
+     (let [req (-> {:request/signal signal
+                    :request/event event}
+                   ((fn [event]
+                      (if (:sync? args)
+                        (assoc event :request/sync? true)
+                        event))))]
+       (go (>! event-chan req))))))
 
 (defmethod ig/init-key ::service
   [_ {:keys [handle! event-chan]}]

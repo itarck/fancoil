@@ -49,4 +49,9 @@
   (fn [config signal & rest] signal))
 
 
-
+(defmulti cron
+  "stateful function: cron a task once or periodic
+   task in -> event views
+   config: dispatch
+   "
+  (fn [config signal & rest] signal))
