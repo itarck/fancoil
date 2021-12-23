@@ -27,7 +27,7 @@
    "
   (fn [core method & args] method))
 
-(defmulti handle!
+(defmulti process
   "stateful function: process a request to fx
    request in -> effects
    core: ratom, other resources

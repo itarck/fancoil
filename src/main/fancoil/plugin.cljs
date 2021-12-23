@@ -39,9 +39,9 @@
     (base/do! core k v))
   response)
 
-;; handle!
+;; process
 
-(defmethod base/handle! :default
+(defmethod base/process :default
   [{:keys [do! handle inject]} method req]
   (let [req (inject :ratom/db req)
         resp (handle method req)]

@@ -24,7 +24,7 @@
    ::fu/inject {:ratom (ig/ref ::fu/ratom)}
    ::fu/do! {:ratom (ig/ref ::fu/ratom)}
    ::fu/handle {:tap (ig/ref ::fu/tap)}
-   ::fu/handle! {:ratom (ig/ref ::fu/ratom)
+   ::fu/process {:ratom (ig/ref ::fu/ratom)
                  :handle (ig/ref ::fu/handle)
                  :inject (ig/ref ::fu/inject)
                  :do! (ig/ref ::fu/do!)}
@@ -33,7 +33,7 @@
               :subscribe (ig/ref ::fu/subscribe)}
    ::fu/chan {}
    ::fu/dispatch {:event-chan (ig/ref ::fu/chan)}
-   ::fu/service {:handle! (ig/ref ::fu/handle!)
+   ::fu/service {:process (ig/ref ::fu/process)
                  :event-chan (ig/ref ::fu/chan)}
    ::fu/schedule {:dispatch (ig/ref ::fu/dispatch)}})
 

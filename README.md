@@ -55,7 +55,7 @@ It is highly inspired by the structure of [re-frame] and [duct].
 | view | view model | model -> reactions -> react component | reagent, rum |
 | dispatch | dispatch event | event -> request | |
 | tap | tap model | value->value | user-defined, for handle, pure function |
-| handle！ | handle! request | request -> effect | default to db-handler |
+| process | process request | request -> effect | default to db-handler |
 | - inject | inject co-effect | request -> request | support for multiple co-fx |
 | - handle | handle request | request -> response | db-handler, pure function |
 | - do！ | do! effect | response -> effect | support for multiple fx |
@@ -66,15 +66,15 @@ It is highly inspired by the structure of [re-frame] and [duct].
 
 * Definition period: in fancoil.base, the type and interface of a machine is defined by defmulti
     ``` clojure
-    (defmulti handle!
+    (defmulti process
         "stateful function
         request in -> effects out
-        config: inject, handle, doall!, other resources"
+        core: inject, handle, do!"
         (fn [core method & args] method))
     ```
 * Implementation period: in fancoil.plugin, some methods of base are implemented, you can include them. Or you can use defmethod to implement them in your project. Method may call other methods of same multi-fn, as is common in handle and subscribe.
   ``` clojure
-  (defmethod base/handle! :default
+  (defmethod base/process :default
     [{:keys [do! handle inject]} method req]
     (let [req (inject :ratom/db req)
           resp (handle method req)]
@@ -83,12 +83,12 @@ It is highly inspired by the structure of [re-frame] and [duct].
 * Runtime period: in fancoil.unit, some integrant init-key method is implemented, and integrant will inject the configuration into the machine when it initializes the system
 
   ``` clojure
-  (defmethod ig/init-key ::handle!
+  (defmethod ig/init-key ::process
      [_ config]
-     (partial base/handle! config))        
+     (partial base/process config))        
   
   (def config 
-    {::handle! {:handle (ig/ref ::handle)
+    {::process {:handle (ig/ref ::handle)
                 :inject (ig/ref ::inject)
                 :do! (ig/ref ::do!)}
    ;; other config })

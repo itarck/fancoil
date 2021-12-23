@@ -28,9 +28,9 @@
   [_ config]
   (partial base/handle config))
 
-(defmethod ig/init-key ::handle!
+(defmethod ig/init-key ::process
   [_ config]
-  (partial base/handle! config))
+  (partial base/process config))
 
 (defmethod ig/init-key ::subscribe
   [_ config]
@@ -65,13 +65,13 @@
        (go (>! event-chan req))))))
 
 (defmethod ig/init-key ::service
-  [_ {:keys [handle! event-chan]}]
+  [_ {:keys [process event-chan]}]
   (go-loop []
     (let [request (<! event-chan)
           {:request/keys [method sync?]} request]
       (if sync?
-        (handle! method request)
-        (go (handle! method request))))
+        (process method request)
+        (go (process method request))))
     (recur))
   {:event-chan event-chan})
 
