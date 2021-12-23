@@ -70,15 +70,15 @@ It is highly inspired by the structure of [re-frame] and [duct].
         "stateful function
         request in -> effects out
         config: inject, handle, doall!, other resources"
-        (fn [config signal & rest] signal))
+        (fn [core method & args] method))
     ```
 * Implementation period: in fancoil.plugin, some methods of base are implemented, you can include them. Or you can use defmethod to implement them in your project. Method may call other methods of same multi-fn, as is common in handle and subscribe.
   ``` clojure
   (defmethod base/handle! :default
-    [{:keys [doall! handle inject]} signal req]
+    [{:keys [do! handle inject]} method req]
     (let [req (inject :ratom/db req)
-          resp (handle signal req)]
-      (doall! resp)))
+          resp (handle method req)]
+      (do! :do/effect resp)))
   ```
 * Runtime period: in fancoil.unit, some integrant init-key method is implemented, and integrant will inject the configuration into the machine when it initializes the system
 
@@ -90,7 +90,7 @@ It is highly inspired by the structure of [re-frame] and [duct].
   (def config 
     {::handle! {:handle (ig/ref ::handle)
                 :inject (ig/ref ::inject)
-               :doall! (ig/ref ::doall!)}
+                :do! (ig/ref ::do!)}
    ;; other config })
   ```
 

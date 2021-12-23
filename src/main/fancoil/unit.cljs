@@ -51,12 +51,12 @@
 (defmethod ig/init-key ::dispatch
   [_ {:keys [event-chan]}]
   (fn dispatch
-    ([signal]
-     (dispatch signal {} {}))
-    ([signal event]
-     (dispatch signal event {:sync? false}))
-    ([signal event args]
-     (let [req (-> {:request/signal signal
+    ([method]
+     (dispatch method {} {}))
+    ([method event]
+     (dispatch method event {:sync? false}))
+    ([method event args]
+     (let [req (-> {:request/method method
                     :request/event event}
                    ((fn [event]
                       (if (:sync? args)
@@ -68,10 +68,10 @@
   [_ {:keys [handle! event-chan]}]
   (go-loop []
     (let [request (<! event-chan)
-          {:request/keys [signal sync?]} request]
+          {:request/keys [method sync?]} request]
       (if sync?
-        (handle! signal request)
-        (go (handle! signal request))))
+        (handle! method request)
+        (go (handle! method request))))
     (recur))
   {:event-chan event-chan})
 

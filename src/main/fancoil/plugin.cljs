@@ -16,14 +16,14 @@
 
 (defmethod base/do! :dispatch/request
   [{:keys [dispatch]} _ request]
-  (let [{:request/keys [signal event]} request]
-    (dispatch signal event)))
+  (let [{:request/keys [method event]} request]
+    (dispatch method event)))
 
 (defmethod base/do! :dispatch/requests
   [{:keys [dispatch]} _ requests]
   (doseq [request requests]
-    (let [{:request/keys [signal event]} request]
-      (dispatch signal event))))
+    (let [{:request/keys [method event]} request]
+      (dispatch method event))))
 
 ;; fx
 
@@ -42,9 +42,9 @@
 ;; handle!
 
 (defmethod base/handle! :default
-  [{:keys [do! handle inject]} signal req]
+  [{:keys [do! handle inject]} method req]
   (let [req (inject :ratom/db req)
-        resp (handle signal req)]
+        resp (handle method req)]
     (do! :do/effect resp)))
 
 
