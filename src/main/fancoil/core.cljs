@@ -23,13 +23,11 @@
    ::fu/tap {}
    ::fu/inject {:ratom (ig/ref ::fu/ratom)}
    ::fu/do! {:ratom (ig/ref ::fu/ratom)}
-   ::fu/doall! {:do! (ig/ref ::fu/do!)}
    ::fu/handle {:tap (ig/ref ::fu/tap)}
    ::fu/handle! {:ratom (ig/ref ::fu/ratom)
                  :handle (ig/ref ::fu/handle)
                  :inject (ig/ref ::fu/inject)
-                 :do! (ig/ref ::fu/do!)
-                 :doall! (ig/ref ::fu/doall!)}
+                 :do! (ig/ref ::fu/do!)}
    ::fu/subscribe {:ratom (ig/ref ::fu/ratom)}
    ::fu/view {:dispatch (ig/ref ::fu/dispatch)
               :subscribe (ig/ref ::fu/subscribe)}

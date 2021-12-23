@@ -24,13 +24,6 @@
   [_ config]
   (partial base/do! config))
 
-(defmethod ig/init-key ::doall!
-  [_ {:keys [do!]}]
-  (fn [resp]
-    (doseq [[k v] resp]
-      (do! k v))
-    resp))
-
 (defmethod ig/init-key ::handle
   [_ config]
   (partial base/handle config))

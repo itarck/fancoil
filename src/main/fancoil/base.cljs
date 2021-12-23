@@ -5,53 +5,54 @@
   "pure function: tap a model
    value in -> value out
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 (defmulti handle
   "pure function: handle a request
    request in -> response out
    {:db db} -> {:tx tx}"
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 (defmulti inject 
   "stateful function: inject a cofx
    request in -> request out
-   config: db-ref, other resources
+   core: db-ref, other resources
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 (defmulti do! 
   "stateful function: do a fx
    response in -> do effects
-   config: db-ref, other resources
+   core: db-ref, other resources
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 (defmulti handle!
   "stateful function: process a request to fx
    request in -> effects
-   config: ratom, other resources
+   core: ratom, other resources
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 (defmulti subscribe 
   "stateful function: subscribe a ratom or reaction
    reaction or ratom in -> reaction out
-   config: db-ref
+   core: db-ref
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 (defmulti view
   "stateful function: view a entity
    props in -> reagent views
-   config: subscribe, dispatch
+   core: subscribe, dispatch
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
 
 
 (defmulti cron
   "stateful function: cron a task once or periodic
    task in -> event views
-   config: dispatch
+   core: dispatch
    "
-  (fn [config signal & rest] signal))
+  (fn [core method & args] method))
+

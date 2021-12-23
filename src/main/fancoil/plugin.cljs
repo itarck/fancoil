@@ -2,15 +2,6 @@
   (:require
    [fancoil.base :as base]))
 
-
-;; handle!
-
-(defmethod base/handle! :default
-  [{:keys [doall! handle inject]} signal req]
-  (let [req (inject :ratom/db req)
-        resp (handle signal req)]
-    (doall! resp)))
-
 ;; ratom
 
 (defmethod base/inject :ratom/db
@@ -36,11 +27,26 @@
 
 ;; fx
 
-(defmethod base/do! :fx/doseq
-  [env _ responses]
+(defmethod base/do! :do/effects
+  [core _ responses]
   (doseq [resp responses]
     (doseq [[k v] resp]
-      (base/do! env k v))))
+      (base/do! core k v))))
+
+(defmethod base/do! :do/effect
+  [core _ response]
+  (doseq [[k v] response]
+    (base/do! core k v))
+  response)
+
+;; handle!
+
+(defmethod base/handle! :default
+  [{:keys [do! handle inject]} signal req]
+  (let [req (inject :ratom/db req)
+        resp (handle signal req)]
+    (do! :do/effect resp)))
+
 
 ;; log
 
