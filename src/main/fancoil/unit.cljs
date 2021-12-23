@@ -40,9 +40,9 @@
   [_ config]
   (partial base/view config))
 
-(defmethod ig/init-key ::cron
+(defmethod ig/init-key ::schedule
   [_ config]
-  (partial base/cron config))
+  (partial base/schedule config))
 
 (defmethod ig/init-key ::chan
   [_ _]

@@ -48,10 +48,9 @@
    "
   (fn [core method & args] method))
 
-
-(defmulti cron
-  "stateful function: cron a task once or periodic
-   task in -> event views
+(defmulti schedule
+  "stateful function: schedule a task once or periodic
+   task in -> event out
    core: dispatch
    "
   (fn [core method & args] method))

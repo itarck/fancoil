@@ -35,5 +35,5 @@
    ::fu/dispatch {:event-chan (ig/ref ::fu/chan)}
    ::fu/service {:handle! (ig/ref ::fu/handle!)
                  :event-chan (ig/ref ::fu/chan)}
-   ::fu/cron {:dispatch (ig/ref ::fu/dispatch)}})
+   ::fu/schedule {:dispatch (ig/ref ::fu/dispatch)}})
 
