@@ -15,8 +15,8 @@ It is highly inspired by the structure of [re-frame] and [duct].
 
 ## Installation
 
-    [com.github.itarck/fancoil "0.0.4-SNAPSHOT"]    ;  Leiningen/Boot
-    com.github.itarck/fancoil {:mvn/version "0.0.4-SNAPSHOT"}    ; Clojure CLI/deps.edn
+    [com.github.itarck/fancoil "0.0.5-SNAPSHOT"]    ;  Leiningen/Boot
+    com.github.itarck/fancoil {:mvn/version "0.0.5-SNAPSHOT"}    ; Clojure CLI/deps.edn
 
 ## How to use
 - Read the source code: not much, ~100 loc
@@ -60,11 +60,11 @@ It is highly inspired by the structure of [re-frame] and [duct].
 | - handle | handle request | request -> response | db-handler, pure function |
 | - do！ | do! effect | response -> effect | support for multiple fx |
 | service | long-run for request | go-loop | support for sync and async |
-| task | once/periodic | | e.g. init process | |
+| schedule | once/periodic | | e.g. init process | |
 
 ## Life cycle of machine
 
-* Definition period: in fancoil.base, the type and interface of a machine is defined by defmulti
+* Definition period: in fancoil.base, the abstraction of a machine is defined by defmulti.
     ``` clojure
     (defmulti process
         "stateful function
@@ -75,7 +75,7 @@ It is highly inspired by the structure of [re-frame] and [duct].
 * Implementation period: in fancoil.plugin, some methods of base are implemented, you can include them. Or you can use defmethod to implement them in your project. Method may call other methods of same multi-fn, as is common in handle and subscribe.
   ``` clojure
   (defmethod base/process :default
-    [{:keys [do! handle inject]} method req]
+    [{:keys [do! handle inject] :as core} method req]
     (let [req (inject :ratom/db req)
           resp (handle method req)]
       (do! :do/effect resp)))
@@ -113,5 +113,6 @@ It is highly inspired by the structure of [re-frame] and [duct].
 [re-frame]:https://github.com/day8/re-frame
 
 ## Other notes
+- Still in PRE-ALPHA, some API may change.
 - Request is hash-map, open. when injecting cofx, it will add namespaced key of the injector.
-- Response is hash-map, open. doall! can execute all effects, no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, or just use fx/doseq
+- Response is hash-map, open. (do! :do/effect response) can execute effect in response, but no guarantee of order. If you need to guarantee the order, use a vector of key-value pairs, just like vector form of a hash-map.

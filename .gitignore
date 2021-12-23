@@ -11,3 +11,4 @@ node_modules
 public/js
 target
 .lein-repl-history
+.vscode
