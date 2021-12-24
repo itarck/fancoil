@@ -47,22 +47,26 @@ It is highly inspired by the structure of [re-frame] and [duct].
 
 ## Types of machine
 
-| Name | Desc | Spec | Detail |
-|---|---|---|---|
-| db | stored state | ref | ratom，datascript |
-| chan | flow state | channel | core.async.chan |
-| subscribe | subscribe reaction | ref-> reaction | tree of reactions |
-| view | view model | model -> reactions -> react component | reagent, rum |
-| dispatch | dispatch event | event -> request | |
-| tap | tap model | value->value | user-defined, for handle, pure function |
-| process | process request | request -> effect | default to db-handler |
-| - inject | inject co-effect | request -> request | support for multiple co-fx |
-| - handle | handle request | request -> response | db-handler, pure function |
-| - do！ | do! effect | response -> effect | support for multiple fx |
-| service | long-run for request | go-loop | support for sync and async |
-| schedule | once/periodic | | e.g. init process | |
+| Name | Core-Tool | Desc | Spec | Detail |
+|---|---|---|---| --- |
+| db | | stored state | ref | ratom，datascript |
+| chan || flow state | channel | core.async.chan |
+| subscribe |✅| subscribe reaction | ref -> reaction | tree of reactions |
+| view |✅| view model | model -> reactions -> react component | reagent, rum |
+| dispatch || dispatch event | event -> request | |
+| tap |✅| tap model | value->value | user-defined, for handle, pure function |
+| process || process request | request -> effect | default to db-handler |
+| - inject |✅| inject co-effect | request -> request | support for multiple co-fx |
+| - handle |✅| handle request | request -> response | db-handler, pure function |
+| - do！ |✅| do! effect | response -> effect | support for multiple fx |
+| service || long-run for request | go-loop | support for sync and async |
+| schedule || once/periodic | | e.g. init process | |
 
-## Life cycle of machine
+## Design Pattern of Core-Tool
+
+Core-Tool seems to be a design pattern, most machines are generated in the Core-Tool way. The core is a hashmap which can contain config data, internal atom, external dependencies etc.
+
+## Life cycle of Core-Tool
 
 * Definition period: in fancoil.base, the abstraction of a machine is defined by defmulti.
     ``` clojure
