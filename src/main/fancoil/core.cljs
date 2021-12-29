@@ -22,7 +22,8 @@
   {::fu/ratom {}
    ::fu/tap {}
    ::fu/inject {:ratom (ig/ref ::fu/ratom)}
-   ::fu/do! {:ratom (ig/ref ::fu/ratom)}
+   ::fu/do! {:ratom (ig/ref ::fu/ratom)
+             :dispatch (ig/ref ::fu/dispatch)}
    ::fu/handle {:tap (ig/ref ::fu/tap)}
    ::fu/process {:ratom (ig/ref ::fu/ratom)
                  :handle (ig/ref ::fu/handle)

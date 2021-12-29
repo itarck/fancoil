@@ -6,4 +6,5 @@
   :source-paths ["src/main"]
   :dependencies [[org.clojure/core.async "1.5.648"]
                  [integrant/integrant "0.8.0"]
-                 [reagent/reagent "1.1.0"]])
+                 [reagent/reagent "1.1.0"]
+                 [medley/medley "1.3.0"]])

@@ -51,8 +51,8 @@
 (defmethod ig/init-key ::dispatch
   [_ {:keys [event-chan]}]
   (fn dispatch
-    ([method]
-     (dispatch method {} {}))
+    ([request]
+     (go (>! event-chan request)))
     ([method event]
      (dispatch method event {:sync? false}))
     ([method event args]

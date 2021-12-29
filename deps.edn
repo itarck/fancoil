@@ -2,6 +2,7 @@
  {thheller/shadow-cljs {:mvn/version "2.16.8"}
   binaryage/devtools {:mvn/version "1.0.3"}
   nrepl/nrepl {:mvn/version "0.8.3"}
+  medley/medley {:mvn/version "1.3.0"}
   integrant/integrant {:mvn/version "0.8.0"}
   reagent/reagent {:mvn/version "1.1.0"}}
  
