@@ -3,7 +3,7 @@
   <groupId>com.github.itarck</groupId>
   <artifactId>fancoil</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.5-SNAPSHOT</version>
+  <version>0.0.6-SNAPSHOT</version>
   <name>fancoil</name>
   <description>A clojurescript framework, which uses multi-methods to define and implement system unit, uses integrant to inject configuration and stateful dependencies to unit at system startup.</description>
   <url>https://github.com/itarck/fancoil</url>
@@ -17,7 +17,7 @@
     <url>https://github.com/itarck/fancoil</url>
     <connection>scm:git:git://github.com/itarck/fancoil.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/itarck/fancoil.git</developerConnection>
-    <tag>cc5990928ca6c7027421e74940311a4fad1749a4</tag>
+    <tag>d676b82ea40728c512aa64b3235e1ea59fc712a2</tag>
   </scm>
   <build>
     <sourceDirectory>src/main</sourceDirectory>
@@ -76,6 +76,11 @@
       <groupId>reagent</groupId>
       <artifactId>reagent</artifactId>
       <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>medley</groupId>
+      <artifactId>medley</artifactId>
+      <version>1.3.0</version>
     </dependency>
   </dependencies>
 </project>
