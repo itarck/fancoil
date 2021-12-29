@@ -49,31 +49,31 @@
   (chan))
 
 (defmethod ig/init-key ::dispatch
-  [_ {:keys [event-chan]}]
+  [_ {:keys [out-chan]}]
   (fn dispatch
     ([request]
-     (go (>! event-chan request)))
+     (go (>! out-chan request)))
     ([method event]
      (dispatch method event {:sync? false}))
     ([method event args]
      (let [req (-> {:request/method method
-                    :request/event event}
+                    :request/body event}
                    ((fn [event]
                       (if (:sync? args)
                         (assoc event :request/sync? true)
                         event))))]
-       (go (>! event-chan req))))))
+       (go (>! out-chan req))))))
 
 (defmethod ig/init-key ::service
-  [_ {:keys [process event-chan]}]
+  [_ {:keys [process in-chan]}]
   (go-loop []
-    (let [request (<! event-chan)
+    (let [request (<! in-chan)
           {:request/keys [method sync?]} request]
       (if sync?
         (process method request)
         (go (process method request))))
     (recur))
-  {:event-chan event-chan})
+  {:in-chan in-chan})
 
 
 

@@ -33,8 +33,8 @@
    ::fu/view {:dispatch (ig/ref ::fu/dispatch)
               :subscribe (ig/ref ::fu/subscribe)}
    ::fu/chan {}
-   ::fu/dispatch {:event-chan (ig/ref ::fu/chan)}
+   ::fu/dispatch {:out-chan (ig/ref ::fu/chan)}
    ::fu/service {:process (ig/ref ::fu/process)
-                 :event-chan (ig/ref ::fu/chan)}
+                 :in-chan (ig/ref ::fu/chan)}
    ::fu/schedule {:dispatch (ig/ref ::fu/dispatch)}})
 
