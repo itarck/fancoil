@@ -54,6 +54,19 @@
   [{:keys [do!]} _method request]
   (do! :log/out request))
 
+(defmethod base/process :log/error
+  [{:keys [do!]} _method request]
+  (do! :log/error request))
+
+(defmethod base/process :do/effect
+  [{:keys [do!]} _method {body :request/body}]
+  (do! :do/effect body))
+
+(defmethod base/process :do/effects
+  [{:keys [do!]} _method {body :request/body}]
+  (do! :do/effects body))
+
+
 (defmethod base/process :default
   [{:keys [do! handle inject]} method req]
   (let [req (inject :ratom/db req)
