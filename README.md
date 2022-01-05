@@ -15,8 +15,8 @@ It is highly inspired by the structure of [re-frame] and [duct].
 
 ## Installation
 
-    [com.github.itarck/fancoil "0.0.6-SNAPSHOT"]    ;  Leiningen/Boot
-    com.github.itarck/fancoil {:mvn/version "0.0.6-SNAPSHOT"}    ; Clojure CLI/deps.edn
+    [com.github.itarck/fancoil "0.0.7-SNAPSHOT"]    ;  Leiningen/Boot
+    com.github.itarck/fancoil {:mvn/version "0.0.7-SNAPSHOT"}    ; Clojure CLI/deps.edn
 
 ## How to use
 - Read the source code: not much, ~100 loc
