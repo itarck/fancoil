@@ -19,16 +19,43 @@ It is highly inspired by the structure of [re-frame] and [duct].
     com.github.itarck/fancoil {:mvn/version "0.0.7-SNAPSHOT"}    ; Clojure CLI/deps.edn
 
 ## How to use
-- Read the source code: not much, ~100 loc
-- Try some [examples here]: includes simple clock, todomvc-ratom, todomvc-datascript, cat chat (with backend via http and ws) 
-- Read [fancoil.module]
 
-[examples here]:https://github.com/itarck/fancoil-example
+- Read the source code: not much, ~100 loc
+- See [fancoil.module], if you need some module to extend
+  - fancoil.module.datascript：[datascript],  an alternative to ratom
+  - fancoil.module.posh：poshed datascript，you can use [posh] in subscribe
+  - fancoil.module.cljs-ajax: a wrap for [cljs-ajax], as plugin of fancoil unit do!
+  - fancoil.module.reitit.html-router: a [reitit] frontend router, already integranted with [accountant] and [clerk], originally from [reagent-template]
+- Try some examples in [fancoil-example] repo: includes simple clock, todomvc-ratom, todomvc-datascript, cat chat (with backend via http and ws) 
+  - [simple]: basic example
+  - [simple-html-router]: use fancoil.module.reitit/html-router
+  - [todomvc-ratom]: basic todomvc example, use ratom
+  - [todomvc-posh]: use fancoil.module.posh
+  - [catchat-full]: use fancoil.module.datascript, fancoil.module.cljs-ajax
+  - [realworld-demo]: use fancoil.module.cljs-ajax, fancoil.module.reitit/html-router
+
+
+
+[fancoil-example]:https://github.com/itarck/fancoil-example
+[simple-html-router]:https://github.com/itarck/fancoil-example/tree/main/simple_html_router
+[todomvc-posh]:https://github.com/itarck/fancoil-example/tree/main/todomvc-posh
+[catchat-full]:https://github.com/itarck/fancoil-example/tree/main/catchat-full
+[realworld-demo]:https://github.com/itarck/fancoil-example/tree/main/realworld
+[simple]:https://github.com/itarck/fancoil-example/tree/main/simple
+[todomvc-ratom]:https://github.com/itarck/fancoil-example/tree/main/todomvc-ratom
+[posh]:https://github.com/denistakeda/posh
+[datascript]:https://github.com/tonsky/datascript
+[cljs-ajax]:https://github.com/JulianBirch/cljs-ajax
+[reitit]:https://github.com/metosin/reitit
+[clerk]:https://github.com/PEZ/clerk
+[accountant]:https://github.com/venantius/accountant
+[reagent-template]:https://github.com/reagent-project/reagent-template
+[fancoil-example]:https://github.com/itarck/fancoil-example
 [fancoil.module]:https://github.com/itarck/fancoil.module
 
 ## System structure
 
-<img src="https://github.com/itarck/fancoil/blob/main/system-structure.jpg" width="400">
+![System structure](https://github.com/itarck/fancoil/blob/main/system-structure3.jpg)
 
 
 ## Concept
@@ -47,7 +74,7 @@ It is highly inspired by the structure of [re-frame] and [duct].
 
 ## Types of machine
 
-| Name | Core-Tool | Desc | Spec | Detail |
+| Name | Homies? | Desc | Spec | Detail |
 |---|---|---|---| --- |
 | db | | stored state | ref | ratom，datascript |
 | chan || flow state | channel | core.async.chan |
@@ -62,11 +89,11 @@ It is highly inspired by the structure of [re-frame] and [duct].
 | service || long-run for request | go-loop | support for sync and async |
 | schedule || once/periodic | | e.g. init process | |
 
-## Design Pattern of Core-Tool
+## Design Pattern of "Homies"
 
-Core-Tool seems to be a design pattern, most machines are generated in the Core-Tool way. The core is a hashmap which can contain config data, internal atom, external dependencies etc.
+Multimethod + integrant seems to be a kind of design pattern, I call it "Homies".  Most machines are generated in the this way. The core of a homies is a hashmap which can contain config data, internal atom, external dependencies etc.
 
-## Life cycle of Core-Tool
+## Life cycle of "Homies"
 
 * Definition period: in fancoil.base, the abstraction of a machine is defined by defmulti.
     ``` clojure
