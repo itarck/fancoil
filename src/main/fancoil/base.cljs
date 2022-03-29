@@ -1,7 +1,7 @@
 (ns fancoil.base)
 
 
-(defmulti tap
+(defmulti model
   "pure function: tap a model
    value in -> value out
    "
@@ -13,14 +13,14 @@
    {:db db} -> {:tx tx}"
   (fn [core method & args] method))
 
-(defmulti inject 
+(defmulti inject
   "stateful function: inject a cofx
    request in -> request out
    core: db-ref, other resources
    "
   (fn [core method & args] method))
 
-(defmulti do! 
+(defmulti do!
   "stateful function: do a fx
    response in -> do effects
    core: db-ref, other resources
@@ -34,7 +34,7 @@
    "
   (fn [core method & args] method))
 
-(defmulti subscribe 
+(defmulti subscribe
   "stateful function: subscribe a ratom or reaction
    reaction or ratom in -> reaction out
    core: db-ref
@@ -54,4 +54,15 @@
    core: dispatch
    "
   (fn [core method & args] method))
+
+(defmulti spec
+  (fn [core method & args] method))
+
+(defmulti schema
+  (fn [config signal & args] signal))
+
+
+(defmulti system
+  (fn [config method & args] method))
+
 
