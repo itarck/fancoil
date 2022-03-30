@@ -14,7 +14,8 @@
    [fancoil.spec]
 
    [fancoil.modules.datascript]
-   [fancoil.modules.cljs-ajax]))
+   [fancoil.modules.cljs-ajax]
+   [fancoil.modules.html-router]))
 
 ;; helper function
 
