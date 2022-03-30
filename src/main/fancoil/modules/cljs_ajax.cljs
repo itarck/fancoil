@@ -50,11 +50,11 @@
 (derive :do.ajax/delete :do.ajax/easy-request)
 
 (defmethod base/do! :do.ajax/easy-request
-  [core method effect]
+  [core method easy-request]
   (go
-    (let [{:keys [uri opt on-success on-failure]
-           :or {opt {} on-failure #(js/console.error %)}
-           on-finally :finally} effect
+    (let [{:keys [uri on-success on-failure]
+           :or {on-failure #(js/console.error %)}
+           on-finally :finally} easy-request
           on-success-handler (if (fn? on-success)
                                on-success
                                (fn [response]
@@ -77,15 +77,15 @@
                                                                 [method (assoc request :event response)])
                                                               on-finally)]
                                    (base/do! core :do.dispatch/actions injected-actions))))
-          opt (-> opt
-                  (assoc :handler on-success-handler
-                         :error-handler on-failure-handler)
-                  ((fn [opt]
-                     (if on-finally-handler
-                       (assoc opt :finally on-finally-handler)
-                       opt))))]
+          easy-request (-> easy-request
+                           (assoc :handler on-success-handler
+                                  :error-handler on-failure-handler)
+                           ((fn [easy-request]
+                              (if on-finally-handler
+                                (assoc easy-request :finally on-finally-handler)
+                                easy-request))))]
       (case method
-        :do.ajax/get (GET uri opt)
-        :do.ajax/post (POST uri opt)
-        :do.ajax/put (PUT uri opt)
-        :do.ajax/delete (DELETE uri opt)))))
+        :do.ajax/get (GET uri easy-request)
+        :do.ajax/post (POST uri easy-request)
+        :do.ajax/put (PUT uri easy-request)
+        :do.ajax/delete (DELETE uri easy-request)))))
