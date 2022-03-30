@@ -325,14 +325,17 @@
 ;; ------------------------------------------------
 ;; system
 
-
 (defn create-system
-  [{:keys [config view-method view-ctx]}]
-  (let [core {:entry-atom (r/atom {:view-method view-method
-                                   :view-ctx view-ctx})
-              :instance-atom (r/atom (ig/init config))}]
+  [config]
+  (let [core {:instance-atom (r/atom (ig/init config))
+              :config config}]
     (fn [method & args]
       (apply base/system core method args))))
+
+(defmethod base/system :system/reload
+  [{:keys [instance-atom config]} _ _]
+  (let [instance (ig/init config)]
+    (reset! instance-atom instance)))
 
 (defmethod base/system :system/get-instance
   [core _ _]
@@ -344,33 +347,16 @@
   (let [instance (base/system core :system/get-instance {})]
     (unit-name instance)))
 
-
-(defmethod base/system :system/mount
-  [{:keys [entry-atom] :as core} _ {:keys [page-element-id]}]
-  (let [view-fn (base/system core :system/get-unit {:unit-name :system/view})
-        root-view (fn []
-                    (let [{:keys [view-method view-ctx]} @entry-atom]
-                      [view-fn view-method view-ctx]))]
+(defmethod base/system :system/mount-view
+  [core _ [view-method view-ctx] app-id]
+  (let [viewer (base/system core :system/get-unit {:unit-name :system/view})]
     (rdom/render
-     [root-view]
-     (.getElementById js/document page-element-id))))
+     [viewer view-method view-ctx]
+     (.getElementById js/document app-id))))
 
 (defmethod base/system :system/dispatch
   [core _ [method request]]
   (let [dispatch-fn (base/system core :system/get-unit {:unit-name :system/dispatch})]
     (dispatch-fn method request)))
 
-
-(defmethod base/system :system/change-view
-  [{:keys [entry-atom]} _ [view-method view-ctx]]
-  (reset! entry-atom {:view-method view-method
-                      :view-ctx view-ctx}))
-
-(defmethod base/system :default
-  [core method ctx]
-  (let [module-name (parse-module-name method)]
-    (case module-name
-      "view" (base/system core :system/change-view [method ctx])
-      "handle" (base/system core :system/dispatch [method ctx])
-      nil)))
 
