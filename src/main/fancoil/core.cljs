@@ -11,7 +11,10 @@
    [medley.core :as m]
 
    [fancoil.base :as base]
-   [fancoil.spec]))
+   [fancoil.spec]
+
+   [fancoil.modules.datascript]
+   [fancoil.modules.cljs-ajax]))
 
 ;; helper function
 
@@ -97,6 +100,7 @@
 
 
 ;; ------------------------------------------------
+
 ;; pconn
 
 (defmethod ig/init-key :system/pconn
@@ -296,7 +300,7 @@
                                        (= effect-method-name "do") (do! k v)
                                        (= effect-method-name "handle") (base/process core k v)
                                        :else (println "effect not allowed")))))
-      :else (println "process method not allowed"))))
+      :else (println "process method not allowed" (str method req)))))
 
 (defmethod ig/init-key :system/process
   [_ config]
@@ -368,3 +372,4 @@
       "view" (base/system core :system/change-view [method ctx])
       "handle" (base/system core :system/dispatch [method ctx])
       nil)))
+
