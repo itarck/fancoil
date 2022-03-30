@@ -16,22 +16,22 @@
 ;; base functions
 
 (defmethod base/do! :do.ajax/request
-  [core _ effect]
+  [core _ request]
   (go
-    (let [{:keys [request on-success on-failure] :or {on-failure #(js/console.error %)}} effect
+    (let [{:keys [on-success on-failure] :or {on-failure #(js/console.error %)}} request
           on-success-handler (if (fn? on-success)
                                on-success
                                (fn [response]
-                                 (let [injected-actions (mapv (fn [[method request]]
-                                                                [method (assoc-in request [:env :ajax-response] response)])
+                                 (let [injected-actions (mapv (fn [[method req]]
+                                                                [method (assoc req :event response)])
                                                               on-success)]
                                    (base/do! core :do.dispatch/actions injected-actions))))
 
           on-failure-handler (if (fn? on-failure)
                                on-failure
                                (fn [response]
-                                 (let [injected-actions (mapv (fn [[method request]]
-                                                                [method (assoc-in request [:env :ajax-response] response)])
+                                 (let [injected-actions (mapv (fn [[method req]]
+                                                                [method (assoc req :event response)])
                                                               on-success)]
                                    (base/do! core :do.dispatch/actions injected-actions))))
           handler (fn [[ok response]]
@@ -59,7 +59,7 @@
                                on-success
                                (fn [response]
                                  (let [injected-actions (mapv (fn [[method request]]
-                                                                [method (assoc-in request [:env :ajax-response] response)])
+                                                                [method (assoc request :event response)])
                                                               on-success)]
                                    (base/do! core :do.dispatch/actions injected-actions))))
 
@@ -67,14 +67,14 @@
                                on-failure
                                (fn [response]
                                  (let [injected-actions (mapv (fn [[method request]]
-                                                                [method (assoc-in request [:env :ajax-response] response)])
+                                                                [method (assoc request :event response)])
                                                               on-failure)]
                                    (base/do! core :do.dispatch/actions injected-actions))))
           on-finally-handler (if (fn? on-finally)
                                on-finally
                                (fn [response]
                                  (let [injected-actions (mapv (fn [[method request]]
-                                                                [method (assoc-in request [:env :ajax-response] response)])
+                                                                [method (assoc request :event response)])
                                                               on-finally)]
                                    (base/do! core :do.dispatch/actions injected-actions))))
           opt (-> opt
