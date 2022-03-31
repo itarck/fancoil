@@ -7,9 +7,9 @@
 
    [fancoil.units :as units]
 
-;;    [fancoil.modules.datascript]
-;;    [fancoil.modules.cljs-ajax]
-;;    [fancoil.modules.html-router]
+   [fancoil.modules.datascript]
+   [fancoil.modules.cljs-ajax]
+   [fancoil.modules.html-router]
    ))
 
 ;; helper function

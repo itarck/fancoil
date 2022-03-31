@@ -2,21 +2,21 @@
   (:require
    [datascript.core :as d]
    [integrant.core :as ig]
-   [fancoil.base :as base]))
+   [fancoil.units :as fu]))
 
 
-(defmethod base/inject :inject.ds/db
+(defmethod fu/inject-base :ds-db
   [{:keys [conn]} _fn req]
   (assoc-in req [:env :db] @conn))
 
 
-(defmethod base/do! :do.ds/tx
+(defmethod fu/do-base :ds-tx
   [{:keys [conn]} _ tx]
   (d/transact! conn tx)
   tx)
 
 
-(defmethod ig/init-key :system/conn [_k config]
+(defmethod ig/init-key :fancoil.system/conn [_k config]
   (let [{:keys [schema initial-tx initial-db] :or {schema {}}} config
         conn (d/create-conn schema)]
     (when initial-db

@@ -5,47 +5,32 @@
    [reitit.frontend :as rfront]
    [clerk.core :as clerk]
    [accountant.core :as accountant]
-
-   [fancoil.base :as fancoil.base]))
+   [fancoil.units :as fu]))
 
 ;; base
 
-(defmulti html-router
+(defmulti html-router-base
   (fn [core method & args] method))
 
-(defmethod html-router :html-router/navigate
+(defmethod html-router-base :navigate
   [core _ path]
   (accountant/navigate! path))
 
-(defmethod html-router :html-router/path-for
+(defmethod html-router-base :path-for
   [core _ page-name & [params]]
   (let [reitit-router (:reitit-router core)]
     (if params
       (:path (rfront/match-by-name reitit-router page-name params))
       (:path (rfront/match-by-name reitit-router page-name)))))
 
-(defmethod html-router :html-router/current-route-atom
+(defmethod html-router-base :current-route-atom
   [core _ _]
   (r/cursor (:router-atom core) [:current-route]))
 
-;; plugin for fancoil
-
-(defmethod fancoil.base/inject :inject.html-router/current-route
-  [{:keys [router]} _ request]
-  (let [current-route @(router :html-router/current-route-atom)]
-    (assoc-in request [:env :current-route] current-route)))
-
-(defmethod fancoil.base/do! :do.router/navigate
-  [{:keys [router]} _ {:keys [page-name params]}]
-  (let [path (router :html-router/path-for page-name params)]
-    (accountant/navigate! path)))
-
-;; -------------------------
-;; Routes
-
-(defmethod ig/init-key :system/html-router
-  [_ {:keys [routes dispatch on-navigate-request]}]
-  (let [reitit-router (rfront/router routes)
+(defn create-html-router-instance
+  [config]
+  (let [{:keys [routes dispatch on-navigate-request]} config
+        reitit-router (rfront/router routes)
         router-atom (r/atom {})
         router-core {:reitit-router reitit-router
                      :router-atom router-atom}]
@@ -67,4 +52,23 @@
       (fn [path]
         (boolean (rfront/match-by-path reitit-router path)))})
     (accountant/dispatch-current!)
-    (partial html-router router-core)))
+    (partial html-router-base router-core)))
+
+;; plugin for fancoil
+
+(defmethod fu/inject-base :current-route
+  [{:keys [html-router]} _ request]
+  (let [current-route @(html-router :current-route-atom)]
+    (assoc-in request [:env :current-route] current-route)))
+
+(defmethod fu/do-base :navigate
+  [{:keys [html-router]} _ {:keys [page-name params]}]
+  (let [path (html-router :path-for page-name params)]
+    (accountant/navigate! path)))
+
+;; -------------------------
+;; Routes
+
+(defmethod ig/init-key :system/html-router
+  [_ config]
+  (create-html-router-instance config))

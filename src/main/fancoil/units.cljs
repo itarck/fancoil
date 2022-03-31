@@ -25,6 +25,21 @@
 (s/def ::hiccup vector?)
 (s/def ::props map?)
 
+(defn- spec-exception [k v spec explain-data]
+  (ex-info (str "Spec failed:  "
+                (with-out-str (s/explain-out explain-data)))
+           {:reason   ::spec-check-failed
+            :key      k
+            :value    v
+            :spec     spec
+            :explain  explain-data}))
+
+(defn- assert-spec [spec value]
+  (when-not (s/valid? spec value)
+    (throw
+     (spec-exception key value spec (s/explain-data spec value)))))
+
+(s/check-asserts true)
 
 ;; ------------------------------------------------
 ;; spec 
@@ -34,7 +49,7 @@
 
 (defmethod spec-base :assert
   [_ _ spec data]
-  (s/assert spec data))
+  (assert-spec spec data))
 
 (defmethod spec-base :valid?
   [_ _ spec data]
@@ -48,7 +63,6 @@
              (qualified-keyword? k)
              (not= (namespace k) "spec"))
         (f)))
-    (s/check-asserts true)
     (partial spec-base {})))
 
 ;; ------------------------------------------------
@@ -107,16 +121,18 @@
 
 (s/def ::subscribe.config map?)
 (s/def ::subscribe.input map?)
-(s/def ::subscribe.output (fn [t] (= ra/Reaction (type t))))
+(s/def ::subscribe.output (fn [t] (or 
+                                   (= ra/Reaction (type t))
+                                   (= ra/RCursor (type t)))))
 
 (defn create-subscribe-instance
   [config]
   (fn [method signal]
     (let [core config]
       (try
-        (s/assert ::subscribe.input signal)
+        (assert-spec ::subscribe.input signal)
         (let [output (subscribe-base core method signal)]
-          (s/assert ::subscribe.output output)
+          (assert-spec ::subscribe.output output)
           output)
         (catch js/Object e (println "error in system/subscribe: " (str e)))))))
 
@@ -141,9 +157,9 @@
   (fn [method scope]
     (let [core config]
       (try
-        (s/assert ::view.input scope)
+        (assert-spec ::view.input scope)
         (let [output (view-base core method scope)]
-          (s/assert ::view.output output)
+          (assert-spec ::view.output output)
           output)
         (catch js/Object e (println "error in system/view: " (str e)))))))
 
@@ -178,23 +194,23 @@
 
 (defmethod inject-base :posh-db
   [{:keys [pconn]} _method req]
-  (assoc-in req [:env :posh-db] @pconn))
+  (assoc-in req [:env :db] @pconn))
 
 (defmethod inject-base :ratom-db
   [{:keys [ratom]} _method req]
   (assoc-in req [:env :ratom-db] @ratom))
 
-(s/def ::inject.input (s/keys :req-un [::event] :opt-un [::env]))
-(s/def ::inject.output (s/keys :req-un [::event ::env]))
+(s/def ::inject.input (s/keys :opt-un [::env ::event]))
+(s/def ::inject.output (s/keys :req-un [::env]))
 
 (defn create-inject-instance
   [config]
   (fn [method req]
     (let [core config]
       (try
-        (s/assert ::inject.input req)
+        (assert-spec ::inject.input req)
         (let [output (inject-base core method req)]
-          (s/assert ::inject.output output)
+          (assert-spec ::inject.output output)
           output)
         (catch js/Object e (println (str e)))))))
 
@@ -220,7 +236,7 @@
    {:db db} -> {:tx tx}"
   (fn [core method & args] method))
 
-(s/def ::handle.input (s/keys :req-un [::event ::env]))
+(s/def ::handle.input (s/keys :req-un [::env] :opt-un [::event]))
 (s/def ::handle.output ::effect)
 
 (defn create-handle-instance
@@ -228,9 +244,9 @@
   (fn [method req]
     (let [core config]
       (try
-        (s/assert ::handle.input req)
+        (assert-spec ::handle.input req)
         (let [output (handle-base core method req)]
-          (s/assert ::handle.output output)
+          (assert-spec ::handle.output output)
           output)
         (catch js/Object e (println "error in system/handle: " (str e)
                                     "method: " method
@@ -324,7 +340,7 @@
   (fn [method req]
     (let [core config]
       (try
-        (s/assert ::do.input req)
+        (assert-spec ::do.input req)
         (let [output (process-base core method req)]
           output)
         (catch js/Object e (println "error in system/process: " (str e)

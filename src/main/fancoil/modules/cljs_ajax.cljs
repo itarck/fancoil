@@ -1,7 +1,7 @@
 (ns fancoil.modules.cljs-ajax
   (:require
    [cljs.core.async :refer [go]]
-   [fancoil.base :as base]
+   [fancoil.units :as fu]
    [ajax.core :refer [json-request-format json-response-format GET POST PUT DELETE]]
    [ajax.simple :refer [ajax-request]]))
 
@@ -15,7 +15,7 @@
 
 ;; base functions
 
-(defmethod base/do! :do.ajax/request
+(defmethod fu/do-base :ajax-request
   [core _ request]
   (go
     (let [{:keys [on-success on-failure] :or {on-failure #(js/console.error %)}} request
@@ -25,7 +25,7 @@
                                  (let [injected-actions (mapv (fn [[method req]]
                                                                 [method (assoc req :event response)])
                                                               on-success)]
-                                   (base/do! core :do.dispatch/actions injected-actions))))
+                                   (fu/do-base core :dispatch-many injected-actions))))
 
           on-failure-handler (if (fn? on-failure)
                                on-failure
@@ -33,7 +33,7 @@
                                  (let [injected-actions (mapv (fn [[method req]]
                                                                 [method (assoc req :event response)])
                                                               on-success)]
-                                   (base/do! core :do.dispatch/actions injected-actions))))
+                                   (fu/do-base core :dispatch-many injected-actions))))
           handler (fn [[ok response]]
                     (if ok
                       (on-success-handler response)
@@ -44,12 +44,12 @@
       (ajax-request merged-request))))
 
 
-(derive :do.ajax/get :do.ajax/easy-request)
-(derive :do.ajax/post :do.ajax/easy-request)
-(derive :do.ajax/put :do.ajax/easy-request)
-(derive :do.ajax/delete :do.ajax/easy-request)
+(derive :ajax-get :ajax-easy-request)
+(derive :ajax-post :ajax-easy-request)
+(derive :ajax-put :ajax-easy-request)
+(derive :ajax-delete :ajax-easy-request)
 
-(defmethod base/do! :do.ajax/easy-request
+(defmethod fu/do-base :ajax-easy-request
   [core method easy-request]
   (go
     (let [{:keys [uri on-success on-failure]
@@ -61,7 +61,7 @@
                                  (let [injected-actions (mapv (fn [[method request]]
                                                                 [method (assoc request :event response)])
                                                               on-success)]
-                                   (base/do! core :do.dispatch/actions injected-actions))))
+                                   (fu/do-base core :dispatch-many injected-actions))))
 
           on-failure-handler (if (fn? on-failure)
                                on-failure
@@ -69,14 +69,14 @@
                                  (let [injected-actions (mapv (fn [[method request]]
                                                                 [method (assoc request :event response)])
                                                               on-failure)]
-                                   (base/do! core :do.dispatch/actions injected-actions))))
+                                   (fu/do-base core :dispatch-many injected-actions))))
           on-finally-handler (if (fn? on-finally)
                                on-finally
                                (fn [response]
                                  (let [injected-actions (mapv (fn [[method request]]
                                                                 [method (assoc request :event response)])
                                                               on-finally)]
-                                   (base/do! core :do.dispatch/actions injected-actions))))
+                                   (fu/do-base core :dispatch-many injected-actions))))
           easy-request (-> easy-request
                            (assoc :handler on-success-handler
                                   :error-handler on-failure-handler)
@@ -85,7 +85,7 @@
                                 (assoc easy-request :finally on-finally-handler)
                                 easy-request))))]
       (case method
-        :do.ajax/get (GET uri easy-request)
-        :do.ajax/post (POST uri easy-request)
-        :do.ajax/put (PUT uri easy-request)
-        :do.ajax/delete (DELETE uri easy-request)))))
+        :ajax-get (GET uri easy-request)
+        :ajax-post (POST uri easy-request)
+        :ajax-put (PUT uri easy-request)
+        :ajax-delete (DELETE uri easy-request)))))
