@@ -15,7 +15,7 @@
 (s/def ::request map?)
 (s/def ::action (s/cat :method ::method
                        :request ::request))
-(s/def ::event map?)
+(s/def ::event some?)
 (s/def ::env map?)
 
 (s/def ::effect (s/coll-of (s/cat :method ::method
@@ -25,19 +25,20 @@
 (s/def ::hiccup vector?)
 (s/def ::props map?)
 
-(defn- spec-exception [k v spec explain-data]
-  (ex-info (str "Spec failed:  "
+(defn- spec-exception [method k v spec explain-data]
+  (ex-info (str "Spec failed in " method ":  "
                 (with-out-str (s/explain-out explain-data)))
            {:reason   ::spec-check-failed
+            :method method
             :key      k
             :value    v
             :spec     spec
             :explain  explain-data}))
 
-(defn- assert-spec [spec value]
+(defn- assert-spec [method spec value]
   (when-not (s/valid? spec value)
     (throw
-     (spec-exception key value spec (s/explain-data spec value)))))
+     (spec-exception method key value spec (s/explain-data spec value)))))
 
 (s/check-asserts true)
 
@@ -48,8 +49,8 @@
   (fn [core method & args] method))
 
 (defmethod spec-base :assert
-  [_ _ spec data]
-  (assert-spec spec data))
+  [_ method spec data]
+  (assert-spec method spec data))
 
 (defmethod spec-base :valid?
   [_ _ spec data]
@@ -130,9 +131,9 @@
   (fn [method signal]
     (let [core config]
       (try
-        (assert-spec ::subscribe.input signal)
+        (assert-spec method ::subscribe.input signal)
         (let [output (subscribe-base core method signal)]
-          (assert-spec ::subscribe.output output)
+          (assert-spec method ::subscribe.output output)
           output)
         (catch js/Object e (println "error in system/subscribe: " (str e)))))))
 
@@ -157,9 +158,9 @@
   (fn [method scope]
     (let [core config]
       (try
-        (assert-spec ::view.input scope)
+        (assert-spec method ::view.input scope)
         (let [output (view-base core method scope)]
-          (assert-spec ::view.output output)
+          (assert-spec method ::view.output output)
           output)
         (catch js/Object e (println "error in system/view: " (str e)))))))
 
@@ -208,9 +209,9 @@
   (fn [method req]
     (let [core config]
       (try
-        (assert-spec ::inject.input req)
+        (assert-spec method ::inject.input req)
         (let [output (inject-base core method req)]
-          (assert-spec ::inject.output output)
+          (assert-spec method ::inject.output output)
           output)
         (catch js/Object e (println (str e)))))))
 
@@ -244,9 +245,9 @@
   (fn [method req]
     (let [core config]
       (try
-        (assert-spec ::handle.input req)
+        (assert-spec method ::handle.input req)
         (let [output (handle-base core method req)]
-          (assert-spec ::handle.output output)
+          (assert-spec method ::handle.output output)
           output)
         (catch js/Object e (println "error in system/handle: " (str e)
                                     "method: " method
@@ -340,7 +341,7 @@
   (fn [method req]
     (let [core config]
       (try
-        (assert-spec ::do.input req)
+        (assert-spec method ::do.input req)
         (let [output (process-base core method req)]
           output)
         (catch js/Object e (println "error in system/process: " (str e)
