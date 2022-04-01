@@ -135,7 +135,7 @@
         (let [output (subscribe-base core method signal)]
           (assert-spec method ::subscribe.output output)
           output)
-        (catch js/Object e (println "error in system/subscribe: " (str e)))))))
+        (catch js/Object e (println "error in subscribe unit: " e))))))
 
 ;; ------------------------------------------------
 ;; view
@@ -162,7 +162,7 @@
         (let [output (view-base core method scope)]
           (assert-spec method ::view.output output)
           output)
-        (catch js/Object e (println "error in system/view: " (str e)))))))
+        (catch js/Object e (println "error in view unit: " e))))))
 
 
 ;; ------------------------------------------------
@@ -249,9 +249,7 @@
         (let [output (handle-base core method req)]
           (assert-spec method ::handle.output output)
           output)
-        (catch js/Object e (println "error in system/handle: " (str e)
-                                    "method: " method
-                                    "request: " (str req)))))))
+        (catch js/Object e (println "error in handle unit: " e))))))
 
 ;; ------------------------------------------------
 ;; do 
@@ -275,11 +273,11 @@
 
 (defmethod do-base :log-out
   [_ _ value]
-  (println "do.log/out: " value))
+  (println "log-out: " value))
 
 (defmethod do-base :log-error
   [_ _ value]
-  (println "do.log/error: " value))
+  (println "log-error: " value))
 
 (defmethod do-base :tx
   [{:keys [pconn]} _ tx]
@@ -344,9 +342,7 @@
         (assert-spec method ::do.input req)
         (let [output (process-base core method req)]
           output)
-        (catch js/Object e (println "error in system/process: " (str e)
-                                    "method: " method
-                                    "request: " (str req))))))
+        (catch js/Object e (println "error in process: " e)))))
   (partial process-base config))
 
 
@@ -378,3 +374,14 @@
 (defn create-schedule-instance
   [config]
   (partial schedule-base config))
+
+
+;; workaround for old codes
+
+(def spec spec-base)
+(def schema schema-base)
+(def handle handle-base)
+(def subscribe subscribe-base)
+(def view view-base)
+(def model model-base)
+(def process process-base)
