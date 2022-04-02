@@ -141,7 +141,8 @@
    ::subscribe {:pconn (ig/ref ::pconn)}
    ::inject {:pconn (ig/ref ::pconn)
              :inject-keys [:posh-db]}
-   ::do! {:pconn (ig/ref ::pconn)}
+   ::do! {:pconn (ig/ref ::pconn)
+          :dispatch (ig/ref ::dispatch)}
    ::model {}
    ::handle {:schema (ig/ref ::schema)
              :model (ig/ref ::model)}
