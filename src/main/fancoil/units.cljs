@@ -334,16 +334,15 @@
 (s/def ::process.input (s/keys :req-un [::event]
                                :opt-un [::env]))
 
-(defn create-process-instance 
+(defn create-process-instance
   [config]
   (fn [method req]
     (let [core config]
       (try
-        (assert-spec method ::do.input req)
+        (assert-spec method ::process.input req)
         (let [output (process-base core method req)]
           output)
-        (catch js/Object e (println "error in process: " e)))))
-  (partial process-base config))
+        (catch js/Object e (println "error in process: " e))))))
 
 
 ;; ------------------------------------------------

@@ -114,11 +114,11 @@
     (unit-name instance)))
 
 (defmethod system-base :mount-view
-  [core _ [view-method view-ctx] app-id]
+  [core _ [view-method view-ctx]]
   (let [viewer (system-base core :get-unit {:unit-name ::view})]
     (rdom/render
      [viewer view-method view-ctx]
-     (.getElementById js/document app-id))))
+     (.getElementById js/document "app"))))
 
 (defmethod system-base :dispatch
   [core _ [method request]]
