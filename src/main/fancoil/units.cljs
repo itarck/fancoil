@@ -1,5 +1,8 @@
 (ns fancoil.units
   (:require
+   [fancoil.base :refer [spec-base schema-base subscribe-base view-base 
+                         inject-base model-base handle-base do-base
+                         process-base schedule-base]]
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [cljs.spec.alpha :as s]
    [datascript.core :as d]
@@ -45,9 +48,6 @@
 ;; ------------------------------------------------
 ;; spec 
 
-(defmulti spec-base
-  (fn [core method & args] method))
-
 (defmethod spec-base :assert
   [_ method spec data]
   (assert-spec method spec data))
@@ -91,8 +91,6 @@
 ;; ------------------------------------------------
 ;; datascript schema
 
-(defmulti schema-base
-  (fn [config signal & args] signal))
 
 (defn create-schema-instance
   [config]
@@ -104,13 +102,6 @@
 
 ;; ------------------------------------------------
 ;; subscribe
-
-(defmulti subscribe-base
-  "stateful function: subscribe a ratom or reaction
-   reaction or ratom in -> reaction out
-   core: db-ref
-   "
-  (fn [core method & args] method))
 
 (defmethod subscribe-base :pull
   [{:keys [pconn]} _ {:keys [selector id]}]
@@ -139,13 +130,6 @@
 
 ;; ------------------------------------------------
 ;; view
-
-(defmulti view-base
-  "stateful function: view a entity
-   props in -> reagent views
-   core: subscribe, dispatch
-   "
-  (fn [core method & args] method))
 
 
 (s/def ::view.config map?)
@@ -180,13 +164,6 @@
 ;; ------------------------------------------------
 ;; inject
 
-(defmulti inject-base
-  "stateful function: inject a cofx
-   request in -> request out
-   core: db-ref, other resources
-   "
-  (fn [core method & args] method))
-
 (defmethod inject-base :inject-all
   [{:keys [inject-keys] :as core} _ request]
   (reduce (fn [req k]
@@ -218,24 +195,12 @@
 ;; ------------------------------------------------
 ;; model
 
-(defmulti model-base
-  "pure function: tap a model
-   value in -> value out
-   "
-  (fn [core method & args] method))
-
 (defn create-model-instance
   [config]
   (partial model-base config))
 
 ;; ------------------------------------------------
 ;; handle
-
-(defmulti handle-base
-  "pure function: handle a request
-   request in -> response out
-   {:db db} -> {:tx tx}"
-  (fn [core method & args] method))
 
 (s/def ::handle.input (s/keys :req-un [::env] :opt-un [::event]))
 (s/def ::handle.output ::effect)
@@ -253,13 +218,6 @@
 
 ;; ------------------------------------------------
 ;; do 
-
-(defmulti do-base
-  "stateful function: do a fx
-   response in -> do effects
-   core: db-ref, other resources
-   "
-  (fn [core method & args] method))
 
 (defmethod do-base :dispatch
   [{:keys [dispatch]} _ action]
@@ -313,13 +271,6 @@
 ;; ------------------------------------------------
 ;; process
 
-(defmulti process-base
-  "stateful function: process a request to fx
-   request in -> effects
-   core: ratom, other resources
-   "
-  (fn [core method & args] method))
-
 (defmethod process-base :default
   [{:keys [do! handle inject] :as core} method req]
   (if (qualified-keyword? method)
@@ -331,8 +282,7 @@
           (do! k v))))
     (do! method req)))
 
-(s/def ::process.input (s/keys :req-un [::event]
-                               :opt-un [::env]))
+(s/def ::process.input (s/keys :opt-un [::env ::event]))
 
 (defn create-process-instance
   [config]
@@ -362,13 +312,6 @@
 
 ;; ------------------------------------------------
 ;; schedule
-
-(defmulti schedule-base
-  "stateful function: schedule a task once or periodic
-   task in -> event out
-   core: dispatch
-   "
-  (fn [core method & args] method))
 
 (defn create-schedule-instance
   [config]

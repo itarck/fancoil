@@ -5,7 +5,7 @@
    [reitit.frontend :as rfront]
    [clerk.core :as clerk]
    [accountant.core :as accountant]
-   [fancoil.units :as fu]))
+   [fancoil.base :as b]))
 
 ;; base
 
@@ -56,12 +56,12 @@
 
 ;; plugin for fancoil
 
-(defmethod fu/inject-base :current-route
+(defmethod b/inject-base :current-route
   [{:keys [html-router]} _ request]
   (let [current-route @(html-router :current-route-atom)]
     (assoc-in request [:env :current-route] current-route)))
 
-(defmethod fu/do-base :navigate
+(defmethod b/do-base :navigate
   [{:keys [html-router]} _ {:keys [page-name params]}]
   (let [path (html-router :path-for page-name params)]
     (accountant/navigate! path)))

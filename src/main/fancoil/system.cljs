@@ -114,19 +114,27 @@
     (unit-name instance)))
 
 (defmethod system-base :mount-view
-  [core _ [view-method view-ctx]]
-  (let [viewer (system-base core :get-unit {:unit-name ::view})]
+  [{:keys [info] :as core} _ [view-method view-ctx]]
+  (let [viewer (system-base core :get-unit {:unit-name (:view info)})]
     (rdom/render
      [viewer view-method view-ctx]
      (.getElementById js/document "app"))))
 
+(defmethod system-base :view
+  [{:keys [info] :as core} _ [view-method view-ctx]]
+  (let [viewer (system-base core :get-unit {:unit-name (:view info)})]
+    [viewer view-method view-ctx]))
+
 (defmethod system-base :dispatch
-  [core _ [method request]]
-  (let [dispatch-fn (system-base core :get-unit {:unit-name ::dispatch})]
+  [{:keys [info] :as core} _ [method request]]
+  (let [dispatch-fn (system-base core :get-unit {:unit-name (:dispatch info)})]
     (dispatch-fn method request)))
 
+(derive ::info ::value)
+
 (def default-config
-  {::schema {}
+  {::info {}
+   ::schema {}
    ::spec {}
    ::pconn {:schema (ig/ref ::schema)
             :initial-tx []}
@@ -151,6 +159,7 @@
 (defn create-system-instance
   [config]
   (let [core {:state-atom (r/atom (ig/init config))
-              :config config}]
+              :config config
+              :info (::info config)}]
     (fn [method & args]
       (apply system-base core method args))))

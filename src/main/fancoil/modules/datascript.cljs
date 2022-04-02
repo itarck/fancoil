@@ -2,15 +2,15 @@
   (:require
    [datascript.core :as d]
    [integrant.core :as ig]
-   [fancoil.units :as fu]))
+   [fancoil.base :as b]))
 
 
-(defmethod fu/inject-base :ds-db
+(defmethod b/inject-base :ds-db
   [{:keys [conn]} _fn req]
   (assoc-in req [:env :db] @conn))
 
 
-(defmethod fu/do-base :ds-tx
+(defmethod b/do-base :ds-tx
   [{:keys [conn]} _ tx]
   (d/transact! conn tx)
   tx)

@@ -1,7 +1,7 @@
 (ns fancoil.modules.cljs-ajax
   (:require
    [cljs.core.async :refer [go]]
-   [fancoil.units :as fu]
+   [fancoil.base :as b]
    [ajax.core :refer [json-request-format json-response-format GET POST PUT DELETE]]
    [ajax.simple :refer [ajax-request]]))
 
@@ -15,7 +15,7 @@
 
 ;; base functions
 
-(defmethod fu/do-base :ajax-request
+(defmethod b/do-base :ajax-request
   [core _ request]
   (go
     (let [{:keys [on-success on-failure] :or {on-failure #(js/console.error %)}} request
@@ -25,7 +25,7 @@
                                  (let [injected-actions (mapv (fn [[method req]]
                                                                 [method (assoc req :event response)])
                                                               on-success)]
-                                   (fu/do-base core :dispatch-many injected-actions))))
+                                   (b/do-base core :dispatch-many injected-actions))))
 
           on-failure-handler (if (fn? on-failure)
                                on-failure
@@ -33,7 +33,7 @@
                                  (let [injected-actions (mapv (fn [[method req]]
                                                                 [method (assoc req :event response)])
                                                               on-success)]
-                                   (fu/do-base core :dispatch-many injected-actions))))
+                                   (b/do-base core :dispatch-many injected-actions))))
           handler (fn [[ok response]]
                     (if ok
                       (on-success-handler response)
@@ -55,7 +55,7 @@
                                (let [injected-actions (mapv (fn [[method request]]
                                                               [method (assoc request :event response)])
                                                             on-success)]
-                                 (fu/do-base core :dispatch-many injected-actions))))
+                                 (b/do-base core :dispatch-many injected-actions))))
 
         on-failure-handler (if (fn? on-failure)
                              on-failure
@@ -63,14 +63,14 @@
                                (let [injected-actions (mapv (fn [[method request]]
                                                               [method (assoc request :event response)])
                                                             on-failure)]
-                                 (fu/do-base core :dispatch-many injected-actions))))
+                                 (b/do-base core :dispatch-many injected-actions))))
         on-finally-handler (if (fn? on-finally)
                              on-finally
                              (fn [response]
                                (let [injected-actions (mapv (fn [[method request]]
                                                               [method (assoc request :event response)])
                                                             on-finally)]
-                                 (fu/do-base core :dispatch-many injected-actions))))
+                                 (b/do-base core :dispatch-many injected-actions))))
         easy-request (-> easy-request
                          (assoc :handler on-success-handler
                                 :error-handler on-failure-handler)
@@ -80,25 +80,25 @@
                               easy-request))))]
     easy-request))
 
-(defmethod fu/do-base :ajax-get
+(defmethod b/do-base :ajax-get
   [core method easy-request]
   (let [{:keys [uri]} easy-request]
     (go
       (GET uri (gen-easy-request core method easy-request)))))
 
-(defmethod fu/do-base :ajax-post
+(defmethod b/do-base :ajax-post
   [core method easy-request]
   (let [{:keys [uri]} easy-request]
     (go
       (POST uri (gen-easy-request core method easy-request)))))
 
-(defmethod fu/do-base :ajax-put
+(defmethod b/do-base :ajax-put
   [core method easy-request]
   (let [{:keys [uri]} easy-request]
     (go
       (PUT uri (gen-easy-request core method easy-request)))))
 
-(defmethod fu/do-base :ajax-delete
+(defmethod b/do-base :ajax-delete
   [core method easy-request]
   (go
     (let [{:keys [uri]} easy-request]
