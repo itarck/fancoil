@@ -5,12 +5,7 @@
    [reagent.dom :as rdom]
    [reagent.core :as r]
 
-   [fancoil.units :as units]
-
-   [fancoil.modules.datascript]
-   [fancoil.modules.cljs-ajax]
-   [fancoil.modules.html-router]
-   ))
+   [fancoil.units :as units]))
 
 ;; helper function
 

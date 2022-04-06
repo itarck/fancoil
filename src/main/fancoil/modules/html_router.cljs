@@ -17,15 +17,13 @@
   (accountant/navigate! path))
 
 (defmethod html-router-base :path-for
-  [core _ page-name & [params]]
+  [core _ [page-name params]]
   (let [reitit-router (:reitit-router core)]
-    (if params
-      (:path (rfront/match-by-name reitit-router page-name params))
-      (:path (rfront/match-by-name reitit-router page-name)))))
+    (:path (rfront/match-by-name reitit-router page-name params))))
 
-(defmethod html-router-base :current-route-atom
+(defmethod html-router-base :router-atom
   [core _ _]
-  (r/cursor (:router-atom core) [:current-route]))
+  (:router-atom core))
 
 (defn create-html-router-instance
   [config]
@@ -40,9 +38,10 @@
       (fn [path]
         (let [match (rfront/match-by-path reitit-router path)
               page-name (:name (:data  match))
-              current-route {:page-name page-name
-                             :page-path path
-                             :path-params (:path-params match)}]
+              current-route (merge
+                             (:path-params match)
+                             {:_env {:page-name page-name
+                                     :page-path path}})]
           (r/after-render clerk/after-render!)
           (swap! router-atom assoc :current-route current-route)
           (when on-navigate-request
@@ -58,17 +57,23 @@
 
 (defmethod b/inject-base :current-route
   [{:keys [html-router]} _ request]
-  (let [current-route @(html-router :current-route-atom)]
-    (assoc-in request [:env :current-route] current-route)))
+  (let [current-route (:current-route @(html-router :router-atom))]
+    (assoc-in request [:_env :current-route] current-route)))
 
 (defmethod b/do-base :navigate
   [{:keys [html-router]} _ {:keys [page-name params]}]
-  (let [path (html-router :path-for page-name params)]
+  (let [path (html-router :path-for [page-name params])]
     (accountant/navigate! path)))
+
+(defmethod b/view-base :router-page
+  [{:keys [html-router] :as core} _ _]
+  (let [current-route-value (:current-route @(html-router :router-atom))
+        page-name (get-in current-route-value [:_env :page-name])]
+    [b/view-base core page-name current-route-value]))
 
 ;; -------------------------
 ;; Routes
 
-(defmethod ig/init-key :system/html-router
+(defmethod ig/init-key :fancoil.system/html-router
   [_ config]
   (create-html-router-instance config))
