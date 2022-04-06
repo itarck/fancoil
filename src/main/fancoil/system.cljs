@@ -130,10 +130,17 @@
   (let [dispatch-fn (system-base core :get-unit {:unit-name (:dispatch info)})]
     (dispatch-fn method request)))
 
+(defmethod system-base :subscribe
+  [{:keys [info] :as core} _ [method request]]
+  (let [subscribe-unit (system-base core :get-unit {:unit-name (:subscribe info)})]
+    @(subscribe-unit method request)))
+
 (derive ::info ::value)
 
 (def default-config
-  {::info {}
+  {::info {:view ::view
+           :dispatch ::dispatch
+           :subscribe ::subscribe}
    ::schema {}
    ::spec {}
    ::pconn {:schema (ig/ref ::schema)

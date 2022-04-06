@@ -19,14 +19,14 @@
 (s/def ::action (s/cat :method ::method
                        :request ::request))
 (s/def ::event some?)
-(s/def ::env map?)
+(s/def ::_env map?)
 
 (s/def ::effect (s/coll-of (s/cat :method ::method
                                   :fx some?)))
 (s/def ::scope map?)
 (s/def ::signal map?)
 (s/def ::hiccup vector?)
-(s/def ::props map?)
+(s/def ::_props map?)
 
 (defn- spec-exception [method k v spec explain-data]
   (ex-info (str "Spec failed in " method ":  "
@@ -172,14 +172,14 @@
 
 (defmethod inject-base :posh-db
   [{:keys [pconn]} _method req]
-  (assoc-in req [:env :db] @pconn))
+  (assoc-in req [:_env :db] @pconn))
 
 (defmethod inject-base :ratom-db
   [{:keys [ratom]} _method req]
-  (assoc-in req [:env :ratom-db] @ratom))
+  (assoc-in req [:_env :ratom-db] @ratom))
 
-(s/def ::inject.input (s/keys :opt-un [::env ::event]))
-(s/def ::inject.output (s/keys :req-un [::env]))
+(s/def ::inject.input (s/keys :opt-un [::_env]))
+(s/def ::inject.output (s/keys :req-un [::_env]))
 
 (defn create-inject-instance
   [config]
@@ -202,7 +202,7 @@
 ;; ------------------------------------------------
 ;; handle
 
-(s/def ::handle.input (s/keys :req-un [::env] :opt-un [::event]))
+(s/def ::handle.input (s/keys :req-un [::_env]))
 (s/def ::handle.output ::effect)
 
 (defn create-handle-instance
@@ -282,7 +282,7 @@
           (do! k v))))
     (do! method req)))
 
-(s/def ::process.input (s/keys :opt-un [::env ::event]))
+(s/def ::process.input (s/keys :opt-un [::_env]))
 
 (defn create-process-instance
   [config]
@@ -303,7 +303,7 @@
   (let [{:keys [process in-chan]} config]
     (go-loop []
       (let [[method request] (<! in-chan)]
-        (if (get-in request [:props :sync?])
+        (if (get-in request [:_props :sync?])
           (process method request)
           (go (process method request))))
       (recur))
