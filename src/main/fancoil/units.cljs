@@ -104,7 +104,7 @@
 ;; subscribe
 
 (defmethod subscribe-base :pull
-  [{:keys [pconn]} _ {:keys [selector id]}]
+  [{:keys [pconn]} _ {:keys [selector id] :or {selector '[*]}}]
   (p/pull pconn selector id))
 
 (defmethod subscribe-base :q
@@ -282,14 +282,11 @@
           (do! k v))))
     (do! method req)))
 
-(s/def ::process.input (s/keys :opt-un [::_env]))
-
 (defn create-process-instance
   [config]
   (fn [method req]
     (let [core config]
       (try
-        (assert-spec method ::process.input req)
         (let [output (process-base core method req)]
           output)
         (catch js/Object e (println "error in process: " e))))))

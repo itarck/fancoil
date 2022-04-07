@@ -104,31 +104,33 @@
     instance))
 
 (defmethod system-base :get-unit
-  [core _ {:keys [unit-name]}]
+  [{:keys [info] :as core} _ unit-key]
   (let [instance (system-base core :get-state {})]
-    (unit-name instance)))
+    (if (qualified-keyword? unit-key)
+      (unit-key instance)
+      ((unit-key info) instance))))
 
 (defmethod system-base :mount-view
   [{:keys [info] :as core} _ [view-method view-ctx]]
-  (let [viewer (system-base core :get-unit {:unit-name (:view info)})]
+  (let [viewer (system-base core :get-unit :view)]
     (rdom/render
      [viewer view-method view-ctx]
      (.getElementById js/document "app"))))
 
 (defmethod system-base :view
-  [{:keys [info] :as core} _ [view-method view-ctx]]
-  (let [viewer (system-base core :get-unit {:unit-name (:view info)})]
+  [{:keys [info] :as core} _ view-method view-ctx]
+  (let [viewer (system-base core :get-unit :view)]
     [viewer view-method view-ctx]))
 
 (defmethod system-base :dispatch
-  [{:keys [info] :as core} _ [method request]]
-  (let [dispatch-fn (system-base core :get-unit {:unit-name (:dispatch info)})]
+  [{:keys [info] :as core} _ method request]
+  (let [dispatch-fn (system-base core :get-unit :dispatch)]
     (dispatch-fn method request)))
 
 (defmethod system-base :subscribe
-  [{:keys [info] :as core} _ [method request]]
-  (let [subscribe-unit (system-base core :get-unit {:unit-name (:subscribe info)})]
-    @(subscribe-unit method request)))
+  [{:keys [info] :as core} _ method request]
+  (let [subscribe-unit (system-base core :get-unit :subscribe)]
+    (subscribe-unit method request)))
 
 (derive ::info ::value)
 

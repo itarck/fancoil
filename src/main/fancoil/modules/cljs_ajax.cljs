@@ -22,16 +22,16 @@
           on-success-handler (if (fn? on-success)
                                on-success
                                (fn [response]
-                                 (let [injected-actions (mapv (fn [[method req]]
-                                                                [method (assoc req :event response)])
+                                 (let [injected-actions (mapv (fn [[method request]]
+                                                                [method (merge request response)])
                                                               on-success)]
                                    (b/do-base core :dispatch-many injected-actions))))
 
           on-failure-handler (if (fn? on-failure)
                                on-failure
                                (fn [response]
-                                 (let [injected-actions (mapv (fn [[method req]]
-                                                                [method (assoc req :event response)])
+                                 (let [injected-actions (mapv (fn [[method request]]
+                                                                [method (merge request response)])
                                                               on-success)]
                                    (b/do-base core :dispatch-many injected-actions))))
           handler (fn [[ok response]]
@@ -53,7 +53,7 @@
                              on-success
                              (fn [response]
                                (let [injected-actions (mapv (fn [[method request]]
-                                                              [method (assoc request :event response)])
+                                                              [method (merge request response)])
                                                             on-success)]
                                  (b/do-base core :dispatch-many injected-actions))))
 
@@ -61,14 +61,14 @@
                              on-failure
                              (fn [response]
                                (let [injected-actions (mapv (fn [[method request]]
-                                                              [method (assoc request :event response)])
+                                                              [method (merge request response)])
                                                             on-failure)]
                                  (b/do-base core :dispatch-many injected-actions))))
         on-finally-handler (if (fn? on-finally)
                              on-finally
                              (fn [response]
                                (let [injected-actions (mapv (fn [[method request]]
-                                                              [method (assoc request :event response)])
+                                                              [method (merge request response)])
                                                             on-finally)]
                                  (b/do-base core :dispatch-many injected-actions))))
         easy-request (-> easy-request
