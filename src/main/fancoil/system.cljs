@@ -111,26 +111,32 @@
       ((unit-key info) instance))))
 
 (defmethod system-base :mount-view
-  [{:keys [info] :as core} _ [view-method view-ctx]]
-  (let [viewer (system-base core :get-unit :view)]
+  [{:keys [info] :as core} _ view-method view-ctx]
+  (let [viewer (system-base core :get-unit :view)
+        mount-element-id (or (:mount-element-id info) "app")]
     (rdom/render
      [viewer view-method view-ctx]
-     (.getElementById js/document "app"))))
+     (.getElementById js/document mount-element-id))))
 
 (defmethod system-base :view
-  [{:keys [info] :as core} _ view-method view-ctx]
-  (let [viewer (system-base core :get-unit :view)]
-    [viewer view-method view-ctx]))
+  [core _ method request]
+  (let [view-unit (system-base core :get-unit :view)]
+    [view-unit method request]))
 
 (defmethod system-base :dispatch
-  [{:keys [info] :as core} _ method request]
-  (let [dispatch-fn (system-base core :get-unit :dispatch)]
-    (dispatch-fn method request)))
+  [core _ method request]
+  (let [dispatch-unit (system-base core :get-unit :dispatch)]
+    (dispatch-unit method request)))
 
 (defmethod system-base :subscribe
-  [{:keys [info] :as core} _ method request]
+  [core _ method request]
   (let [subscribe-unit (system-base core :get-unit :subscribe)]
     (subscribe-unit method request)))
+
+(defmethod system-base :do!
+  [core _ method request]
+  (let [do-unit (system-base core :get-unit :do!)]
+    (do-unit method request)))
 
 (derive ::info ::value)
 

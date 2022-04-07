@@ -5,6 +5,7 @@
                          process-base schedule-base]]
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [cljs.spec.alpha :as s]
+   [cljs.pprint :refer [pprint]]
    [datascript.core :as d]
    [posh.reagent :as p]
    [medley.core :as m]
@@ -231,11 +232,13 @@
 
 (defmethod do-base :log-out
   [_ _ value]
-  (println "log-out: " value))
+  (println "log-out: ")
+  (pprint value))
 
 (defmethod do-base :log-error
   [_ _ value]
-  (println "log-error: " value))
+  (println "log-error: ")
+  (pprint value))
 
 (defmethod do-base :tx
   [{:keys [pconn]} _ tx]

@@ -27,7 +27,7 @@
 
 (defn create-html-router-instance
   [config]
-  (let [{:keys [routes dispatch on-navigate-request]} config
+  (let [{:keys [routes dispatch on-navigate-hook]} config
         reitit-router (rfront/router routes)
         router-atom (r/atom {})
         router-core {:reitit-router reitit-router
@@ -38,14 +38,13 @@
       (fn [path]
         (let [match (rfront/match-by-path reitit-router path)
               page-name (:name (:data  match))
-              current-route (merge
-                             (:path-params match)
-                             {:_env {:page-name page-name
-                                     :page-path path}})]
+              current-route {:page-name page-name
+                             :page-path path
+                             :page-params (:path-params match)}]
           (r/after-render clerk/after-render!)
           (swap! router-atom assoc :current-route current-route)
-          (when on-navigate-request
-            (dispatch on-navigate-request current-route))
+          (when on-navigate-hook
+            (dispatch on-navigate-hook {}))
           (clerk/navigate-page! path)))
       :path-exists?
       (fn [path]
@@ -58,18 +57,18 @@
 (defmethod b/inject-base :current-route
   [{:keys [html-router]} _ request]
   (let [current-route (:current-route @(html-router :router-atom))]
-    (assoc-in request [:_env :current-route] current-route)))
+    (update-in request [:_env] (fn [env] (merge env current-route)))))
 
 (defmethod b/do-base :navigate
-  [{:keys [html-router]} _ {:keys [page-name params]}]
-  (let [path (html-router :path-for [page-name params])]
+  [{:keys [html-router]} _ {:keys [page-name page-params]}]
+  (let [path (html-router :path-for [page-name page-params])]
     (accountant/navigate! path)))
 
 (defmethod b/view-base :router-page
   [{:keys [html-router] :as core} _ _]
-  (let [current-route-value (:current-route @(html-router :router-atom))
-        page-name (get-in current-route-value [:_env :page-name])]
-    [b/view-base core page-name current-route-value]))
+  (let [current-route (:current-route @(html-router :router-atom))
+        {:keys [page-name page-params]} current-route]
+    [b/view-base core page-name (assoc page-params :_env current-route)]))
 
 ;; -------------------------
 ;; Routes
