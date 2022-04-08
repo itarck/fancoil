@@ -108,6 +108,11 @@
   [{:keys [pconn]} _ {:keys [selector id] :or {selector '[*]}}]
   (p/pull pconn selector id))
 
+(defmethod subscribe-base :pull-many
+  [{:keys [pconn]} _ {:keys [selector ids] :or {selector '[*]}}]
+  (r/reaction
+   (doall (mapv (fn [id] @(p/pull pconn selector id)) ids))))
+
 (defmethod subscribe-base :q
   [{:keys [pconn]} _ {:keys [query inputs]}]
   (apply p/q query (concat [pconn] inputs)))
@@ -204,7 +209,7 @@
 ;; handle
 
 (s/def ::handle.input (s/keys :req-un [::_env]))
-(s/def ::handle.output ::effect)
+(s/def ::handle.output (s/or :nil nil? :effect ::effect))
 
 (defn create-handle-instance
   [config]
@@ -215,7 +220,7 @@
         (let [output (handle-base core method req)]
           (assert-spec method ::handle.output output)
           output)
-        (catch js/Object e (println "error in handle unit: " e))))))
+        (catch js/Object e (println "error in handle unit: " method req e))))))
 
 ;; ------------------------------------------------
 ;; do 

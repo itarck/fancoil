@@ -44,7 +44,7 @@
           (r/after-render clerk/after-render!)
           (swap! router-atom assoc :current-route current-route)
           (when on-navigate-hook
-            (dispatch on-navigate-hook {}))
+            (dispatch on-navigate-hook current-route))
           (clerk/navigate-page! path)))
       :path-exists?
       (fn [path]
