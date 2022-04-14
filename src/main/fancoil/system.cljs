@@ -94,8 +94,8 @@
   (fn [config method & args] method))
 
 (defmethod system-base :reload
-  [{:keys [state-atom config]} _ _]
-  (let [instance (ig/init config)]
+  [{:keys [state-atom config]} _ user-config]
+  (let [instance (ig/init (merge-config config user-config))]
     (reset! state-atom instance)))
 
 (defmethod system-base :get-state
