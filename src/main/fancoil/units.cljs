@@ -275,20 +275,20 @@
     (let [core config]
       (do-base core method req))))
 
-
 ;; ------------------------------------------------
 ;; process
 
 (defmethod process-base :default
   [{:keys [do! handle inject] :as core} method req]
-  (if (qualified-keyword? method)
-    (let [req (inject :inject-all req)
-          effect (handle method req)]
-      (doseq [[k v] effect]
-        (if (qualified-keyword? k)
-          (process-base core k v)
-          (do! k v))))
-    (do! method req)))
+  (let [handle-mathods (methods handle-base)]
+    (if (contains? handle-mathods method)
+      (let [req (inject :inject-all req)
+            effect (handle method req)]
+        (doseq [[k v] effect]
+          (if (contains? handle-mathods k)
+            (process-base core k v)
+            (do! k v))))
+      (do! method req))))
 
 (defn create-process-instance
   [config]
