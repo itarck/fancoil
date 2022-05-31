@@ -12,5 +12,5 @@
   venantius/accountant {:mvn/version "0.2.5"}
   reagent/reagent {:mvn/version "1.1.0"}}
  
- :paths ["src/main" "src/test"]}
+ :paths ["src/main" "src/test" "src/demo"]}
 

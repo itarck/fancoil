@@ -174,3 +174,9 @@
               :info (::info config)}]
     (fn [method & args]
       (apply system-base core method args))))
+
+
+(comment 
+  (ig/init default-config)
+  
+  )
