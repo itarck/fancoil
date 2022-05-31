@@ -86,6 +86,10 @@
   [old-config new-config]
   (merge-with merge old-config new-config))
 
+(defn create-instance
+  [base-fn core]
+  (fn instance [method & args]
+    (apply base-fn core method args)))
 
 ;; ------------------------------------------------
 ;; system
@@ -142,12 +146,4 @@
    ::service {:process (ig/ref ::process)
               :in-chan (ig/ref ::chan)}})
 
-(defn create-instance
-  [base-fn core]
-  (fn instance [method & args]
-    (apply base-fn core method args)))
 
-(comment 
-  (ig/init default-config)
-  
-  )

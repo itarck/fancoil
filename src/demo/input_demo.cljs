@@ -7,67 +7,39 @@
    [fancoil.base :as fb]
    [fancoil.system :as fs]))
 
-;; -----------------------------------------
-;; handle 
-
-(defmethod fb/handle-base :app/set-value
-  [_ _ {:keys [new-value]}]
-  {:set-ratom-paths {[:value] new-value}})
-
-;; -----------------------------------------
-;; subs
-
-(defmethod fb/subscribe-base :app/get-value
-  [{:keys [ratom]} _ _]
-  (r/cursor ratom [:value]))
-
 
 (defmethod fb/view-base :app/view
-  [{:keys [dispatch subscribe]} _ props]
-  (let [value @(subscribe :app/get-value {})]
+  [{:keys [ratom]} _ _]
+  (let [value @(r/cursor ratom [:value])]
     [:div
      [:input {:value value
               :on-change (fn [e]
                            (let [new-value (j/get-in e [:target :value])]
-                             (dispatch :app/set-value {:new-value new-value})))}]
+                             (swap! ratom assoc :value new-value)))}]
      [:p "current value: " value]]))
 
 
 ;; -------------------------
 ;; integrant 
 
-;; you can write it from scratch
-
 (def config
   {::fs/ratom {:initial-value {}}
-   ::fs/inject {:ratom (ig/ref ::fs/ratom)
-                :inject-keys [:ratom-db]}
-   ::fs/do! {:ratom (ig/ref ::fs/ratom)}
-   ::fs/handle {}
-   ::fs/process {:ratom (ig/ref ::fs/ratom)
-                 :handle (ig/ref ::fs/handle)
-                 :inject (ig/ref ::fs/inject)
-                 :do! (ig/ref ::fs/do!)}
-   ::fs/subscribe {:ratom (ig/ref ::fs/ratom)}
-   ::fs/view {:dispatch (ig/ref ::fs/dispatch)
-              :subscribe (ig/ref ::fs/subscribe)}
-   ::fs/chan {}
-   ::fs/dispatch {:out-chan (ig/ref ::fs/chan)}
-   ::fs/service {:process (ig/ref ::fs/process)
-                 :in-chan (ig/ref ::fs/chan)}})
-
+   ::fs/view {:ratom (ig/ref ::fs/ratom)}})
 
 (defonce system-core
   (ig/init config))
 
+(defonce system-instance
+  (fs/create-instance fs/system-base system-core))
 
 ;; -------------------------
 ;; Initialize app
 
 (defn mount-root
   []
-  (rdom/render [(::fs/view system-core) :app/view {}]
-               (js/document.getElementById "app")))
+  (let [v (system-instance ::fs/view)]
+    (rdom/render [v :app/view {}]
+                 (js/document.getElementById "app"))))
 
 
 (defn ^:export init! []
@@ -76,12 +48,7 @@
 
 (comment
 
-  (def ins1
-    (fs/create-instance fs/system-base (ig/init config)))
-
-  (ins1 :keys)
-  (ins1 :methods)
-
-  (ins1 ::fs/do! :log-out 1111)
+  (system-instance ::fs/ratom)
+  (system-instance :keys)
 
   )
