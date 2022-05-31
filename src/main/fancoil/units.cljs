@@ -29,6 +29,9 @@
 (s/def ::hiccup vector?)
 (s/def ::_props map?)
 
+;; ------------------------------------------------
+;; spec 
+
 (defn- spec-exception [method k v spec explain-data]
   (ex-info (str "Spec failed in " method ":  "
                 (with-out-str (s/explain-out explain-data)))
@@ -46,9 +49,6 @@
 
 (s/check-asserts true)
 
-;; ------------------------------------------------
-;; spec 
-
 (defmethod spec-base :assert
   [_ method spec data]
   (assert-spec method spec data))
@@ -58,14 +58,14 @@
   (s/valid? spec data))
 
 (defn create-spec-instance
-  [config]
+  [core]
   (let [ms (methods spec-base)]
     (doseq [[k f] ms]
       (when (and
              (qualified-keyword? k)
              (not= (namespace k) "spec"))
         (f)))
-    (partial spec-base {})))
+    :spec-loaded))
 
 ;; ------------------------------------------------
 ;; ratom
@@ -125,7 +125,7 @@
 
 (defn create-subscribe-instance
   [config]
-  (fn [method signal]
+  (fn subscribe [method signal]
     (let [core config]
       (try
         (assert-spec method ::subscribe.input signal)
@@ -145,7 +145,7 @@
 
 (defn create-view-instance
   [config]
-  (fn [method scope]
+  (fn view [method scope]
     (let [core config]
       (try
         (assert-spec method ::view.input scope)
@@ -163,7 +163,7 @@
 (defn create-dispatch-instance
   [config]
   (let [{:keys [out-chan]} config]
-    (fn [method request]
+    (fn dispatch [method request]
       (go (>! out-chan [method request])))))
 
 
@@ -189,7 +189,7 @@
 
 (defn create-inject-instance
   [config]
-  (fn [method req]
+  (fn inject [method req]
     (let [core config]
       (try
         (assert-spec method ::inject.input req)
@@ -203,7 +203,8 @@
 
 (defn create-model-instance
   [config]
-  (partial model-base config))
+  (fn model [method & args]
+    (apply model-base config method args)))
 
 ;; ------------------------------------------------
 ;; handle
@@ -213,7 +214,7 @@
 
 (defn create-handle-instance
   [config]
-  (fn [method req]
+  (fn handle [method req]
     (let [core config]
       (try
         (assert-spec method ::handle.input req)
@@ -291,7 +292,7 @@
 
 (defn create-process-instance
   [config]
-  (fn [method req]
+  (fn process [method req]
     (let [core config]
       (try
         (let [output (process-base core method req)]
@@ -318,16 +319,7 @@
 ;; schedule
 
 (defn create-schedule-instance
-  [config]
-  (partial schedule-base config))
+  [core]
+  (fn schedule [method & args]
+    (apply schedule-base core method args)))
 
-
-;; workaround for old codes
-
-(def spec spec-base)
-(def schema schema-base)
-(def handle handle-base)
-(def subscribe subscribe-base)
-(def view view-base)
-(def model model-base)
-(def process process-base)
