@@ -73,8 +73,8 @@
   [core _ props]
   [:div
    [:h1 "Hello world, it is now"]
-   (fb/view-base core :clock/timer {})
-   (fb/view-base core :clock/color-input {})])
+   [fb/view-base core :clock/timer {}]
+   [fb/view-base core :clock/color-input {}]])
 
 
 ;; -----------------------------------------
