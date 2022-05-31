@@ -57,7 +57,7 @@
                  :in-chan (ig/ref ::fs/chan)}})
 
 
-(defonce system
+(defonce system-core
   (ig/init config))
 
 
@@ -66,10 +66,22 @@
 
 (defn mount-root
   []
-  (rdom/render [(::fs/view system) :app/view {}]
+  (rdom/render [(::fs/view system-core) :app/view {}]
                (js/document.getElementById "app")))
 
 
 (defn ^:export init! []
   (mount-root))
 
+
+(comment
+
+  (def ins1
+    (fs/create-instance fs/system-base (ig/init config)))
+
+  (ins1 :keys)
+  (ins1 :methods)
+
+  (ins1 ::fs/do! :log-out 1111)
+
+  )

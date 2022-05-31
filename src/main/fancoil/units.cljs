@@ -268,10 +268,9 @@
   [{:keys [stdout-chan]} _ data]
   (go (>! stdout-chan data)))
 
-
 (defn create-do-instance
   [config]
-  (fn [method req]
+  (fn do! [method req]
     (let [core config]
       (do-base core method req))))
 

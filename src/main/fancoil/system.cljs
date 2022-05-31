@@ -91,59 +91,34 @@
 ;; system
 
 (defmulti system-base
-  (fn [config method & args] method))
+  (fn [core method & args] method))
 
-(defmethod system-base :reload
-  [{:keys [state-atom config]} _ user-config]
-  (let [instance (ig/init (merge-config config user-config))]
-    (reset! state-atom instance)))
+(defmethod system-base :core
+  [core _]
+  core)
 
-(defmethod system-base :get-state
-  [core _ _]
-  (let [instance @(:state-atom core)]
-    instance))
+(defmethod system-base :keys
+  [core _]
+  (keys core))
 
-(defmethod system-base :get-unit
-  [{:keys [info] :as core} _ unit-key]
-  (let [instance (system-base core :get-state {})]
-    (if (qualified-keyword? unit-key)
-      (unit-key instance)
-      ((unit-key info) instance))))
+(defmethod system-base :methods
+  [core _]
+  (keys (methods system-base)))
 
-(defmethod system-base :mount-view
-  [{:keys [info] :as core} _ view-method view-ctx]
-  (let [viewer (system-base core :get-unit :view)
-        mount-element-id (or (:mount-element-id info) "app")]
-    (rdom/render
-     [viewer view-method view-ctx]
-     (.getElementById js/document mount-element-id))))
-
-(defmethod system-base :view
-  [core _ method request]
-  (let [view-unit (system-base core :get-unit :view)]
-    [view-unit method request]))
-
-(defmethod system-base :dispatch
-  [core _ method request]
-  (let [dispatch-unit (system-base core :get-unit :dispatch)]
-    (dispatch-unit method request)))
-
-(defmethod system-base :subscribe
-  [core _ method request]
-  (let [subscribe-unit (system-base core :get-unit :subscribe)]
-    (subscribe-unit method request)))
-
-(defmethod system-base :do!
-  [core _ method request]
-  (let [do-unit (system-base core :get-unit :do!)]
-    (do-unit method request)))
+(defmethod system-base :default
+  [core method & args]
+  (if (contains? core method)
+    (if (seq args)
+      (apply (get core method) args)
+      (get core method))
+    (throw (ex-info "system-base method not match"
+                    {:method method
+                     :args args}))))
 
 (derive ::info ::value)
 
 (def default-config
-  {::info {:view ::view
-           :dispatch ::dispatch
-           :subscribe ::subscribe}
+  {::info {:project-name "default"}
    ::schema {}
    ::spec {}
    ::pconn {:schema (ig/ref ::schema)
@@ -167,14 +142,10 @@
    ::service {:process (ig/ref ::process)
               :in-chan (ig/ref ::chan)}})
 
-(defn create-system-instance
-  [config]
-  (let [core {:state-atom (r/atom (ig/init config))
-              :config config
-              :info (::info config)}]
-    (fn [method & args]
-      (apply system-base core method args))))
-
+(defn create-instance
+  [base-fn core]
+  (fn instance [method & args]
+    (apply base-fn core method args)))
 
 (comment 
   (ig/init default-config)
