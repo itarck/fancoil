@@ -75,7 +75,7 @@
 
 ;; ------------------------------------------------
 ;; helper functions
-  
+
 (defn load-hierarchy
   [hierarchy]
   (doseq [[tag parents] hierarchy

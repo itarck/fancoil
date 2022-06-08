@@ -212,9 +212,7 @@
   (fn handle [method req]
     (let [core config]
       (try
-        (assert-spec method ::handle.input req)
         (let [output (handle-base core method req)]
-          (assert-spec method ::handle.output output)
           output)
         (catch js/Object e (println "error in handle unit: " method req e))))))
 
