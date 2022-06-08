@@ -137,15 +137,14 @@
 ;; ------------------------------------------------
 ;; view
 
-(s/def ::view.config map?)
 (s/def ::view.method ::method)
 
 (defn create-view-instance
   [config]
-  (fn view [method scope]
+  (fn view [method props & args]
     (let [core config]
       (try
-        (let [output (view-base core method scope)]
+        (let [output (vec (concat [view-base core method props] args))]
           output)
         (catch js/Object e (println "error in view unit: " e))))))
 
