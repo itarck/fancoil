@@ -1,6 +1,7 @@
 (ns fancoil.modules.router
   (:require
    [reagent.core :as r]
+   [reitit.core :as reitit]
    [integrant.core :as ig]
    [reitit.frontend :as rfront]
    [reitit.coercion :as coercion]
@@ -27,7 +28,12 @@
 (defmethod router-base :path-for
   [core _ page-args]
   (let [reitit-router (:reitit-router core)]
-    (:path (apply rfront/match-by-name reitit-router page-args))))
+    (if (= 3 (count page-args))
+      (let [[page-name path-params query-params] page-args]
+        (-> reitit-router
+            (reitit/match-by-name page-name path-params)
+            (reitit/match->path query-params)))
+      (:path (apply rfront/match-by-name reitit-router page-args)))))
 
 (defmethod router-base :router-atom
   [core _ _]
