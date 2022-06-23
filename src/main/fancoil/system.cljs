@@ -73,6 +73,10 @@
   [_ config]
   (units/create-service-instance config))
 
+(defmethod ig/init-key ::component
+  [_ config]
+  (units/create-component-instance config))
+
 ;; ------------------------------------------------
 ;; helper functions
 

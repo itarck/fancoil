@@ -2,7 +2,7 @@
   (:require
    [fancoil.base :refer [spec-base schema-base subscribe-base view-base 
                          inject-base model-base handle-base do-base
-                         process-base schedule-base]]
+                         process-base schedule-base component-base]]
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [cljs.spec.alpha :as s]
    [cljs.pprint :refer [pprint]]
@@ -133,6 +133,14 @@
           (assert-spec method ::subscribe.output output)
           output)
         (catch js/Object e (println "error in subscribe unit: " e))))))
+
+;; ------------------------------------------------
+;; view
+
+(defn create-component-instance
+  [config]
+  (fn model [method & args]
+    (apply component-base config method args)))
 
 ;; ------------------------------------------------
 ;; view

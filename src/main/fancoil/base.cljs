@@ -62,3 +62,7 @@
    core: dispatch
    "
   (fn [core method & args] method))
+
+(defmulti component-base 
+  "view component"
+  (fn [core method & args] method))
