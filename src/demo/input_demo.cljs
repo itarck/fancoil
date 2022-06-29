@@ -5,6 +5,7 @@
    [reagent.dom :as rdom]
    [integrant.core :as ig]
    [fancoil.base :as fb]
+   [fancoil.units :as fu]
    [fancoil.system :as fs]))
 
 
@@ -23,8 +24,8 @@
 ;; integrant 
 
 (def config
-  {::fs/ratom {:initial-value {}}
-   ::fs/view {:ratom (ig/ref ::fs/ratom)}})
+  {::fu/ratom {:initial-value {}}
+   ::fu/view {:ratom (ig/ref ::fu/ratom)}})
 
 (defonce system-core
   (ig/init config))
@@ -37,7 +38,7 @@
 
 (defn mount-root
   []
-  (let [v (system-instance ::fs/view)]
+  (let [v (system-instance ::fu/view)]
     (rdom/render [v :app/view {}]
                  (js/document.getElementById "app"))))
 
@@ -48,7 +49,7 @@
 
 (comment
 
-  (system-instance ::fs/ratom)
+  (system-instance ::fu/ratom)
   (system-instance :keys)
 
   )

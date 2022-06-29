@@ -4,6 +4,7 @@
    [reagent.dom :as rdom]
    [integrant.core :as ig]
    [fancoil.base :as fb]
+   [fancoil.units :as fu]
    [fancoil.system :as fs]
    [fancoil.modules.cljs-ajax]
    [fancoil.modules.router]
@@ -45,19 +46,19 @@
                  :parameters {:path {:id int?}}}]])
 
 (def hierarchy
-  {::pconn [::fs/pconn]
-   ::schema [::fs/schema]
-   ::inject [::fs/inject]
-   ::do! [::fs/do!]
-   ::model [::fs/model]
-   ::handle [::fs/handle]
-   ::process [::fs/process]
-   ::subscribe [::fs/subscribe]
-   ::view [::fs/view]
-   ::chan [::fs/chan]
-   ::dispatch [::fs/dispatch]
-   ::service [::fs/service]
-   ::router [::fs/router]})
+  {::pconn [::fu/pconn]
+   ::schema [::fu/schema]
+   ::inject [::fu/inject]
+   ::do! [::fu/do!]
+   ::model [::fu/model]
+   ::handle [::fu/handle]
+   ::process [::fu/process]
+   ::subscribe [::fu/subscribe]
+   ::view [::fu/view]
+   ::chan [::fu/chan]
+   ::dispatch [::fu/dispatch]
+   ::service [::fu/service]
+   ::router [::fu/router]})
 
 (fs/load-hierarchy hierarchy)
 

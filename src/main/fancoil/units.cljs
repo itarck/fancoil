@@ -7,13 +7,22 @@
    [cljs.spec.alpha :as s]
    [cljs.pprint :refer [pprint]]
    [datascript.core :as d]
+   [integrant.core :as ig]
    [posh.reagent :as p]
    [medley.core :as m]
    [reagent.core :as r]
    [reagent.ratom :as ra]))
 
 
-;; ctx spec
+;; ------------------------------------------------
+;; value 
+
+(defmethod ig/init-key ::value
+  [_ config]
+  config)
+
+;; ------------------------------------------------
+;; spec 
 
 (s/def ::method keyword?)
 (s/def ::request map?)
@@ -28,9 +37,6 @@
 (s/def ::signal map?)
 (s/def ::hiccup vector?)
 (s/def ::_props map?)
-
-;; ------------------------------------------------
-;; spec 
 
 (defn- spec-exception [method k v spec explain-data]
   (ex-info (str "Spec failed in " method ":  "
@@ -67,6 +73,10 @@
         (f)))
     :spec-loaded))
 
+(defmethod ig/init-key ::spec
+  [_ config]
+  (create-spec-instance config))
+
 ;; ------------------------------------------------
 ;; ratom
 
@@ -74,6 +84,26 @@
   [config]
   (let [{:keys [initial-value]} config]
     (r/atom initial-value)))
+
+(defmethod ig/init-key ::ratom
+  [_ config]
+  (create-ratom config))
+
+;; ------------------------------------------------
+;; datascript schema
+
+
+(defn create-schema-instance
+  [config]
+  (let [schema-ref (atom {})]
+    (doseq [[k f] (methods schema-base)]
+      (let [schm (f)]
+        (swap! schema-ref merge schm)))
+    @schema-ref))
+
+(defmethod ig/init-key ::schema
+  [_ config]
+  (create-schema-instance config))
 
 ;; ------------------------------------------------
 ;; poshed-ds
@@ -89,17 +119,10 @@
     (p/posh! conn)
     conn))
 
-;; ------------------------------------------------
-;; datascript schema
+(defmethod ig/init-key ::pconn
+  [_k config]
+  (create-poshed-datascript-conn config))
 
-
-(defn create-schema-instance
-  [config]
-  (let [schema-ref (atom {})]
-    (doseq [[k f] (methods schema-base)]
-      (let [schm (f)]
-        (swap! schema-ref merge schm)))
-    @schema-ref))
 
 ;; ------------------------------------------------
 ;; subscribe
@@ -134,13 +157,21 @@
           output)
         (catch js/Object e (println "error in subscribe unit: " e))))))
 
+(defmethod ig/init-key ::subscribe
+  [_ config]
+  (create-subscribe-instance config))
+
 ;; ------------------------------------------------
-;; view
+;; component
 
 (defn create-component-instance
   [config]
   (fn model [method & args]
     (apply component-base config method args)))
+
+(defmethod ig/init-key ::component
+  [_ config]
+  (create-component-instance config))
 
 ;; ------------------------------------------------
 ;; view
@@ -156,6 +187,16 @@
           output)
         (catch js/Object e (println "error in view unit: " e))))))
 
+(defmethod ig/init-key ::view
+  [_ config]
+  (create-view-instance config))
+
+;; ------------------------------------------------
+;; chan
+
+(defmethod ig/init-key ::chan
+  [_ _]
+  (chan))
 
 ;; ------------------------------------------------
 ;; dispatch 
@@ -168,6 +209,9 @@
     (fn dispatch [method request]
       (go (>! out-chan [method request])))))
 
+(defmethod ig/init-key ::dispatch
+  [_ config]
+  (create-dispatch-instance config))
 
 ;; ------------------------------------------------
 ;; inject
@@ -200,6 +244,10 @@
           output)
         (catch js/Object e (println (str e)))))))
 
+(defmethod ig/init-key ::inject
+  [_ config]
+  (create-inject-instance config))
+
 ;; ------------------------------------------------
 ;; model
 
@@ -207,6 +255,10 @@
   [config]
   (fn model [method & args]
     (apply model-base config method args)))
+
+(defmethod ig/init-key ::model
+  [_ config]
+  (create-model-instance config))
 
 ;; ------------------------------------------------
 ;; handle
@@ -222,6 +274,10 @@
         (let [output (handle-base core method req)]
           output)
         (catch js/Object e (println "error in handle unit: " method req e))))))
+
+(defmethod ig/init-key ::handle
+  [_ config]
+  (create-handle-instance config))
 
 ;; ------------------------------------------------
 ;; do 
@@ -275,6 +331,10 @@
     (let [core config]
       (do-base core method req))))
 
+(defmethod ig/init-key ::do!
+  [_ config]
+  (create-do-instance config))
+
 ;; ------------------------------------------------
 ;; process
 
@@ -299,6 +359,9 @@
           output)
         (catch js/Object e (println "error in process: " e))))))
 
+(defmethod ig/init-key ::process
+  [_ config]
+  (create-process-instance config))
 
 ;; ------------------------------------------------
 ;; service
@@ -314,6 +377,9 @@
       (recur))
     {:in-chan in-chan}))
 
+(defmethod ig/init-key ::service
+  [_ config]
+  (create-service-instance config))
 
 ;; ------------------------------------------------
 ;; schedule
@@ -323,3 +389,6 @@
   (fn schedule [method & args]
     (apply schedule-base core method args)))
 
+(defmethod ig/init-key ::schedule
+  [_ config]
+  (create-schedule-instance config))

@@ -93,6 +93,6 @@
 ;; -------------------------
 ;; Routes
 
-(defmethod ig/init-key :fancoil.system/router
+(defmethod ig/init-key :fancoil.units/router
   [_ config]
   (create-router-instance config))

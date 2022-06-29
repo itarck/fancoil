@@ -4,78 +4,8 @@
    [integrant.core :as ig]
    [reagent.dom :as rdom]
    [reagent.core :as r]
+   [fancoil.units :as u]))
 
-   [fancoil.units :as units]))
-
-;; helper function
-
-(defmethod ig/init-key ::value
-  [_ config]
-  config)
-
-(defmethod ig/init-key ::spec
-  [_ config]
-  (units/create-spec-instance config))
-
-(defmethod ig/init-key ::ratom
-  [_ config]
-  (units/create-ratom config))
-
-(defmethod ig/init-key ::pconn
-  [_k config]
-  (units/create-poshed-datascript-conn config))
-
-(defmethod ig/init-key ::schema
-  [_ config]
-  (units/create-schema-instance config))
-
-(defmethod ig/init-key ::subscribe
-  [_ config]
-  (units/create-subscribe-instance config))
-
-(defmethod ig/init-key ::view
-  [_ config]
-  (units/create-view-instance config))
-
-(defmethod ig/init-key ::model
-  [_ config]
-  (units/create-model-instance config))
-
-(defmethod ig/init-key ::handle
-  [_ config]
-  (units/create-handle-instance config))
-
-(defmethod ig/init-key ::schedule
-  [_ config]
-  (units/create-schedule-instance config))
-
-(defmethod ig/init-key ::chan
-  [_ _]
-  (chan))
-
-(defmethod ig/init-key ::dispatch
-  [_ config]
-  (units/create-dispatch-instance config))
-
-(defmethod ig/init-key ::inject
-  [_ config]
-  (units/create-inject-instance config))
-
-(defmethod ig/init-key ::do!
-  [_ config]
-  (units/create-do-instance config))
-
-(defmethod ig/init-key ::process
-  [_ config]
-  (units/create-process-instance config))
-
-(defmethod ig/init-key ::service
-  [_ config]
-  (units/create-service-instance config))
-
-(defmethod ig/init-key ::component
-  [_ config]
-  (units/create-component-instance config))
 
 ;; ------------------------------------------------
 ;; helper functions
@@ -123,7 +53,22 @@
                     {:method method
                      :args args}))))
 
-(derive ::info ::value)
+(def hierarchy
+  {::info [::u/value]
+   ::schema [::u/schema]
+   ::pconn [::u/pconn]
+   ::inject [::u/inject]
+   ::do! [::u/do!]
+   ::model [::u/model]
+   ::handle [::u/handle]
+   ::process [::u/process]
+   ::subscribe [::u/subscribe]
+   ::component [::u/component]
+   ::view [::u/view]
+   ::chan [::u/chan]
+   ::dispatch [::u/dispatch]
+   ::service [::u/service]
+   ::router [::u/router]})
 
 (def default-config
   {::info {:project-name "default"}

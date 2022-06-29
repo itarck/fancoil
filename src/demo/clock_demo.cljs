@@ -5,6 +5,7 @@
    [reagent.dom :as rdom]
    [integrant.core :as ig]
    [fancoil.base :as fb]
+   [fancoil.units :as fu]
    [fancoil.system :as fs]))
 
 
@@ -93,24 +94,24 @@
 ;; you can write it from scratch
 
 (def config
-  {::fs/ratom {:initial-value {}}
-   ::fs/inject {:ratom (ig/ref ::fs/ratom)
+  {::fu/ratom {:initial-value {}}
+   ::fu/inject {:ratom (ig/ref ::fu/ratom)
                 :inject-keys [:ratom-db]}
-   ::fs/do! {:ratom (ig/ref ::fs/ratom)}
-   ::fs/handle {}
-   ::fs/process {:ratom (ig/ref ::fs/ratom)
-                 :handle (ig/ref ::fs/handle)
-                 :inject (ig/ref ::fs/inject)
-                 :do! (ig/ref ::fs/do!)}
-   ::fs/subscribe {:ratom (ig/ref ::fs/ratom)}
-   ::fs/view {:dispatch (ig/ref ::fs/dispatch)
-              :subscribe (ig/ref ::fs/subscribe)
-              :schedule (ig/ref ::fs/schedule)}
-   ::fs/chan {}
-   ::fs/dispatch {:out-chan (ig/ref ::fs/chan)}
-   ::fs/schedule {:dispatch (ig/ref ::fs/dispatch)}
-   ::fs/service {:process (ig/ref ::fs/process)
-                 :in-chan (ig/ref ::fs/chan)}})
+   ::fu/do! {:ratom (ig/ref ::fu/ratom)}
+   ::fu/handle {}
+   ::fu/process {:ratom (ig/ref ::fu/ratom)
+                 :handle (ig/ref ::fu/handle)
+                 :inject (ig/ref ::fu/inject)
+                 :do! (ig/ref ::fu/do!)}
+   ::fu/subscribe {:ratom (ig/ref ::fu/ratom)}
+   ::fu/view {:dispatch (ig/ref ::fu/dispatch)
+              :subscribe (ig/ref ::fu/subscribe)
+              :schedule (ig/ref ::fu/schedule)}
+   ::fu/chan {}
+   ::fu/dispatch {:out-chan (ig/ref ::fu/chan)}
+   ::fu/schedule {:dispatch (ig/ref ::fu/dispatch)}
+   ::fu/service {:process (ig/ref ::fu/process)
+                 :in-chan (ig/ref ::fu/chan)}})
 
 
 (defonce system
@@ -123,12 +124,12 @@
 
 (defn mount-root
   []
-  (let [dispatch (::fs/dispatch system)
-        schedule (::fs/schedule system)]
+  (let [dispatch (::fu/dispatch system)
+        schedule (::fu/schedule system)]
     (dispatch :app/initialize {:_props {:sync? true}})
     (schedule :clock/start-tictac {:interval 1000}))
 
-  (rdom/render [(::fs/view system) :app/root-view {}]
+  (rdom/render [(::fu/view system) :app/root-view {}]
                (js/document.getElementById "app")))
 
 

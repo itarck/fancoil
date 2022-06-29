@@ -16,7 +16,7 @@
   tx)
 
 
-(defmethod ig/init-key :fancoil.system/conn [_k config]
+(defmethod ig/init-key :fancoil.units/conn [_k config]
   (let [{:keys [schema initial-tx initial-db] :or {schema {}}} config
         conn (d/create-conn schema)]
     (when initial-db
