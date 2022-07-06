@@ -141,7 +141,6 @@
   (apply p/q query (concat [pconn] inputs)))
 
 (s/def ::subscribe.config map?)
-(s/def ::subscribe.input map?)
 (s/def ::subscribe.output (fn [t] (or 
                                    (= ra/Reaction (type t))
                                    (= ra/RCursor (type t)))))
@@ -151,7 +150,6 @@
   (fn subscribe [method signal]
     (let [core config]
       (try
-        (assert-spec method ::subscribe.input signal)
         (let [output (subscribe-base core method signal)]
           (assert-spec method ::subscribe.output output)
           output)
