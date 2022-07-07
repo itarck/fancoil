@@ -142,6 +142,7 @@
 
 (s/def ::subscribe.config map?)
 (s/def ::subscribe.output (fn [t] (or 
+                                   (= cljs.core/Atom (type t))
                                    (= ra/Reaction (type t))
                                    (= ra/RCursor (type t)))))
 
