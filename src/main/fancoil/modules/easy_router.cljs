@@ -1,15 +1,11 @@
 (ns fancoil.modules.easy-router
   (:require
-   [cljs.pprint :refer [pprint]]
    [fancoil.base :as b]
    [integrant.core :as ig]
    [reagent.core :as r]
-   [reagent.dom :as rdom]
    [reitit.frontend :as rf]
    [reitit.frontend.easy :as rfe]
-   [reitit.coercion.spec :as rss]
-   [spec-tools.data-spec :as ds]))
-
+   [reitit.coercion.spec :as rss]))
 
 ;; base
 
@@ -73,39 +69,3 @@
   [_ config] 
   (create-router-instance config))
 
-
-;; ======
-
-;; (defonce match (r/atom nil))
-
-;; (defn current-page []
-;;   [:div
-;;    [:ul
-;;     [:li [:a {:href (rfe/href ::frontpage)} "Frontpage"]]
-;;     [:li [:a {:href (rfe/href ::about)} "About"]]
-;;     [:li [:a {:href (rfe/href ::item {:id 1})} "Item 1"]]
-;;     [:li [:a {:href (rfe/href ::item {:id 2} {:foo "bar"})} "Item 2"]]]
-;;    (if @match
-;;      (let [view (:name (:data @match))]
-;;        [view-base view @match]))
-;;    [:pre (with-out-str (pprint @match))]])
-
-;; (def routes
-;;   [["/"
-;;     {:name ::frontpage}]
-
-;;    ["/about"
-;;     {:name ::about}]
-
-;;    ["/item/:id"
-;;     {:name ::item
-;;      :parameters {:path {:id int?}
-;;                   :query {(ds/opt :foo) keyword?}}}]])
-
-;; (defn init! []
-;;   (rfe/start!
-;;    (rf/router routes {:data {:coercion rss/coercion}})
-;;    (fn [m] (reset! match m))
-;;     ;; set to false to enable HistoryAPI
-;;    {:use-fragment true})
-;;   (rdom/render [current-page] (.getElementById js/document "app")))
