@@ -237,7 +237,7 @@
   (fn inject [method req]
     (let [core config]
       (try
-        (assert-spec method ::inject.input req)
+        ;; (assert-spec method ::inject.input req)
         (let [output (inject-base core method req)]
           (assert-spec method ::inject.output output)
           output)

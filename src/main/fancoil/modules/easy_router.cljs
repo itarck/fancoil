@@ -40,7 +40,7 @@
 
 (defmethod b/inject-base :current-route
   [{:keys [router]} _ request]
-  (let [current-route (:data @(router :router-atom))]
+  (let [current-route @(router :router-atom)]
     (update-in request [:_env] (fn [env] (merge env current-route)))))
 
 (defmethod b/do-base :navigate
