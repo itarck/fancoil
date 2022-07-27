@@ -24,6 +24,15 @@
   [core _ _]
   (:router-atom core))
 
+(defmethod router-base :current-route
+  [{:keys [router-atom]} _ ]
+  @router-atom)
+
+(defmethod router-base :with-path
+  [core _ cursor]
+  (let [current-route (router-base core :current-route)]
+    (into [(:path current-route)] cursor)))
+
 (defn create-router-instance
   [config]
   (let [{:keys [routes]} config
