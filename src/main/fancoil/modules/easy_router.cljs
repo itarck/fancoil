@@ -33,17 +33,6 @@
   (let [current-route (router-base core :current-route)]
     (into [(:path current-route)] cursor)))
 
-(defn create-router-instance
-  [config]
-  (let [{:keys [routes]} config
-        core {:router-atom (r/atom nil)}]
-    (rfe/start!
-     (rf/router routes {:data {:coercion rss/coercion}})
-     (fn [m] (reset! (:router-atom core) m))
-    ;; set to false to enable HistoryAPI
-     {:use-fragment true})
-    (partial router-base core))
-  )
 
 ;; plugin for fancoil
 
@@ -73,6 +62,26 @@
 
 ;; -------------------------
 ;; Routes
+
+(defn create-router-instance
+  [config]
+  (let [{:keys [routes dispatch before-navigate-method after-navigate-method]} config
+        core {:router-atom (r/atom nil)}]
+    (rfe/start!
+     (rf/router routes {:data {:coercion rss/coercion}})
+     (fn [m]
+       (let [prev-route @(:router-atom core)]
+         (when before-navigate-method
+           (dispatch before-navigate-method {:prev-route prev-route
+                                             :current-route m}))
+         (reset! (:router-atom core) m)
+         (when after-navigate-method
+           (dispatch after-navigate-method {:prev-route prev-route
+                                            :current-route m}))))
+     
+    ;; set to false to enable HistoryAPI
+     {:use-fragment true})
+    (partial router-base core)))
 
 (defmethod ig/init-key :fancoil.units/easy-router
   [_ config] 
