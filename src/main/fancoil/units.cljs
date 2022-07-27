@@ -205,8 +205,8 @@
 (defn create-dispatch-instance
   [config]
   (let [{:keys [out-chan]} config]
-    (fn dispatch [method request]
-      (go (>! out-chan [method request])))))
+    (fn dispatch [& args]
+      (go (>! out-chan args)))))
 
 (defmethod ig/init-key ::dispatch
   [_ config]
@@ -326,9 +326,9 @@
 
 (defn create-do-instance
   [config]
-  (fn do! [method req]
+  (fn do! [method & args]
     (let [core config]
-      (do-base core method req))))
+      (apply do-base core method args))))
 
 (defmethod ig/init-key ::do!
   [_ config]
@@ -338,23 +338,25 @@
 ;; process
 
 (defmethod process-base :default
-  [{:keys [do! handle inject] :as core} method req]
+  [{:keys [do! handle inject] :as core} method & args]
+  ;; (println "in process default" method args)
   (let [handle-mathods (methods handle-base)]
     (if (contains? handle-mathods method)
-      (let [req (inject :inject-all req)
+      (let [req' (first args)
+            req (inject :inject-all req')
             effect (handle method req)]
-        (doseq [[k v] effect]
-          (if (contains? handle-mathods k)
-            (process-base core k v)
-            (do! k v))))
-      (do! method req))))
+        (doseq [action effect]
+          (if (contains? handle-mathods (first action))
+            (apply process-base core action)
+            (apply do! action))))
+      (apply do! method args))))
 
 (defn create-process-instance
   [config]
-  (fn process [method req]
+  (fn process [& args]
     (let [core config]
       (try
-        (let [output (process-base core method req)]
+        (let [output (apply process-base core args)]
           output)
         (catch js/Object e (println "error in process: " e))))))
 
@@ -369,10 +371,11 @@
   [config]
   (let [{:keys [process in-chan]} config]
     (go-loop []
-      (let [[method request] (<! in-chan)]
-        (if (get-in request [:_props :sync?])
-          (process method request)
-          (go (process method request))))
+      (let [action (<! in-chan)]
+        ;; (println "in service: " action)
+        (if (and (map? (second action)) (get-in (second action) [:_props :sync?]))
+          (apply process action)
+          (go (apply process action))))
       (recur))
     {:in-chan in-chan}))
 
