@@ -149,7 +149,7 @@
 (defn create-subscribe-instance
   [config]
   (fn subscribe [method signal]
-    (let [core config]
+    (let [core (assoc config :subscribe subscribe)]
       (try
         (let [output (subscribe-base core method signal)]
           (assert-spec method ::subscribe.output output)
@@ -165,8 +165,9 @@
 
 (defn create-component-instance
   [config]
-  (fn model [method & args]
-    (apply component-base config method args)))
+  (fn component [method & args]
+    (let [core (assoc config :component component)]
+      (apply component-base core method args))))
 
 (defmethod ig/init-key ::component
   [_ config]
@@ -180,14 +181,14 @@
 (defn create-view-instance
   [config]
   (fn view [method props & args]
-    (let [core config]
+    (let [core (assoc config :view view)]
       (try
         (let [output (vec (concat [view-base core method props] args))]
           output)
         (catch js/Object e (println "error in view unit: " e))))))
 
 (defmethod ig/init-key ::view
-  [_ config]
+  [_ config] 
   (create-view-instance config))
 
 ;; ------------------------------------------------
@@ -253,7 +254,8 @@
 (defn create-model-instance
   [config]
   (fn model [method & args]
-    (apply model-base config method args)))
+    (let [core (assoc config :model model)]
+      (apply model-base core method args))))
 
 (defmethod ig/init-key ::model
   [_ config]
@@ -268,7 +270,7 @@
 (defn create-handle-instance
   [config]
   (fn handle [method req]
-    (let [core config]
+    (let [core (assoc config :handle handle)]
       (try
         (let [output (handle-base core method req)]
           output)
