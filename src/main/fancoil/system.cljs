@@ -4,6 +4,7 @@
    [integrant.core :as ig]
    [reagent.dom :as rdom]
    [reagent.core :as r]
+   [fancoil.base :as b]
    [fancoil.units :as u]))
 
 
@@ -24,6 +25,23 @@
   [base-fn core]
   (fn instance [method & args]
     (apply base-fn core method args)))
+
+(defn reg
+  [fn-type fn-method function]
+  (cond
+    (= fn-type :subscribe) (defmethod b/subscribe-base fn-method
+                             [core _ & args]
+                             (apply function core args))
+    (= fn-type :view) (defmethod b/view-base fn-method
+                        [core _ & args]
+                        (apply function core args))
+    (= fn-type :handle) (defmethod b/handle-base fn-method
+                          [core _ & args]
+                          (apply function core args))
+    (= fn-type :component) (defmethod b/component-base fn-method
+                          [core _ & args]
+                          (apply function core args))
+    :else (throw (js/Error. "function type error"))))
 
 ;; ------------------------------------------------
 ;; system
