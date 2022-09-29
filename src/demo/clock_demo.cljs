@@ -21,11 +21,11 @@
 
 (defmethod fb/handle-base :clock/time-color-change
   [_ _ {:keys [new-color-value]}]
-  {:set-ratom-paths {[:time-color] new-color-value}})
+  {:assoc-ratom {:path [:time-color] :value new-color-value}})
 
 (defmethod fb/handle-base :clock/timer
   [_ _ {:keys [new-time]}]
-  {:set-ratom-paths {[:time] new-time}
+  {:update-ratom {:path [:time] :args [identity new-time]}
    :log-out new-time})
 
 ;; -----------------------------------------

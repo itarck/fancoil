@@ -63,19 +63,20 @@
   [_ _ spec data]
   (s/valid? spec data))
 
-(defn create-spec-instance
-  [core]
+(defmethod ig/init-key ::spec
+  [_ config]
   (let [ms (methods spec-base)]
     (doseq [[k f] ms]
       (when (and
              (qualified-keyword? k)
              (not= (namespace k) "spec"))
         (f)))
-    :spec-loaded))
-
-(defmethod ig/init-key ::spec
-  [_ config]
-  (create-spec-instance config))
+    (fn spec [method]
+      (let [core (assoc config :spec spec)]
+        (try
+          (let [output (spec-base core method)]
+            output)
+          (catch js/Object e (println "error in spec unit: " e)))))))
 
 ;; ------------------------------------------------
 ;; ratom
@@ -145,6 +146,10 @@
                                    (= cljs.core/Atom (type t))
                                    (= ra/Reaction (type t))
                                    (= ra/RCursor (type t)))))
+
+(defmethod subscribe-base :cursor-ratom
+  [{:keys [ratom]} _ {:keys [path]}]
+  (r/cursor ratom path))
 
 (defn create-subscribe-instance
   [config]
@@ -309,22 +314,23 @@
   tx)
 
 (defmethod do-base :reset-ratom
-  [{:keys [ratom]} _ db-value]
-  (reset! ratom db-value))
+  [{:keys [ratom]} _ value]
+  (reset! ratom value))
 
-(defmethod do-base :set-ratom-paths
-  [{:keys [ratom]} _ path-value-pairs]
-  (doseq [[path value] path-value-pairs]
-    (swap! ratom assoc-in path value)))
+(defmethod do-base :assoc-ratom
+  [{:keys [ratom]} _ {:keys [path value]}]
+  (let [cursor (r/cursor ratom path)]
+    (reset! cursor value)))
 
-(defmethod do-base :delete-ratom-paths
-  [{:keys [ratom]} _ paths]
-  (doseq [path paths]
-    (swap! ratom m/dissoc-in path)))
+(defmethod do-base :update-ratom
+  [{:keys [ratom]} _ {:keys [path args]}]
+  (let [cursor (r/cursor ratom path)]
+    (apply swap! cursor args)))
 
-(defmethod do-base :stdout
-  [{:keys [stdout-chan]} _ data]
-  (go (>! stdout-chan data)))
+(defmethod do-base :dissoc-ratom
+  [{:keys [ratom]} _ {:keys [path]}]
+  (let [cursor (r/cursor ratom path)]
+    (reset! cursor nil)))
 
 (defn create-do-instance
   [config]
