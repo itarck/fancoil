@@ -256,6 +256,25 @@
 ;; ------------------------------------------------
 ;; model
 
+(defmethod model-base :db
+  [{:keys [pconn]} _method]
+  @pconn)
+
+(defmethod model-base :pull
+  [core _ {:keys [selector id] :or {selector '[*]}}]
+  (let [db (model-base core :db)]
+    (d/pull db selector id)))
+
+(defmethod model-base :pull-many
+  [core _ {:keys [selector ids] :or {selector '[*]}}]
+  (let [db (model-base core :db)]
+    (mapv (fn [id] (d/pull db selector id)) ids)))
+
+(defmethod model-base :q
+  [core _ {:keys [query inputs]}]
+  (let [db (model-base core :db)]
+    (apply d/q query (concat [db] inputs))))
+
 (defn create-model-instance
   [config]
   (fn model [method & args]
