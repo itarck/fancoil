@@ -19,10 +19,14 @@
   [{:keys [state*]} _]
   (r/cursor state* [:current-page]))
 
+(defmethod pager-base :cursor-cache
+  [{:keys [state*]} _]
+  (r/cursor state* [:cache]))
 
 (defmethod pager-base :change-page
   [{:keys [state*]} _ {:keys [page]}]
   (swap! state* assoc :current-page page)
+  (swap! state* assoc :cache {:timestamp (js/Date.)})
   (swap! state* update :history-pages (fn [pages] 
                                         (vec (take 10 (conj pages page))))))
 

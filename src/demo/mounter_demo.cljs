@@ -1,5 +1,6 @@
 (ns mounter-demo
   (:require
+   [applied-science.js-interop :as j]
    [integrant.core :as ig]
    [fancoil.base :as fb]
    [fancoil.units :as fu]
@@ -17,7 +18,9 @@
     [:div [:button {:on-click #(pager :change-page {:page [:app/item-page {:id 1}]})}
            "navigate to item1"]]
     [:div [:button {:on-click #(pager :change-page {:page [:app/item-page {:id 2}]})}
-           "navigate to item2"]]]])
+           "navigate to item2"]]
+    [:div [:button {:on-click #(pager :change-page {:page [:app/input-page ]})}
+           "navigate to input page"]]]])
 
 
 (defmethod fb/view-base :app/item-page
@@ -27,6 +30,20 @@
    [:div 
     [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]])
 
+(defmethod fb/view-base :app/input-page
+  [{:keys [pager]} _ _]
+  (let [cache* (pager :cursor-cache)
+        value (:value @cache*)]
+    [:div
+     [:p (str @cache*)]
+     [:input {:value value
+              :on-change (fn [e]
+                           (let [new-value (j/get-in e [:target :value])]
+                             (swap! cache* assoc :value new-value)))}]
+     [:p "current value: " value]
+     [:div
+      [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]]
+    ))
 
 ;; integrant
 
@@ -108,3 +125,6 @@
 
 
 
+(comment 
+  (sys ::pager :get-state)
+  )
