@@ -223,9 +223,11 @@
 
 (defmethod inject-base :inject-all
   [{:keys [inject-keys] :as core} _ request]
-  (reduce (fn [req k]
+  (if (seq inject-keys)
+   (reduce (fn [req k]
             (inject-base core k req))
-          request inject-keys))
+          request inject-keys)
+    request))
 
 (defmethod inject-base :posh-db
   [{:keys [pconn]} _method req]
@@ -235,18 +237,12 @@
   [{:keys [ratom]} _method req]
   (assoc-in req [:_env :ratom-db] @ratom))
 
-(s/def ::inject.input (s/keys :opt-un [::_env]))
-(s/def ::inject.output (s/keys :req-un [::_env]))
-
 (defn create-inject-instance
   [config]
   (fn inject [method req]
     (let [core config]
       (try
-        ;; (assert-spec method ::inject.input req)
-        (let [output (inject-base core method req)]
-          (assert-spec method ::inject.output output)
-          output)
+        (inject-base core method req)
         (catch js/Object e (println (str e)))))))
 
 (defmethod ig/init-key ::inject
