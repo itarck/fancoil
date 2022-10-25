@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as r]
    [reagent.dom :as rdom]
-   [fancoil.base :as b :refer [pager-base]]
+   [fancoil.base :as b :refer [pager-base do-base nav-base]]
    [integrant.core :as ig]))
 
 
@@ -24,7 +24,7 @@
   (swap! state* update :history-pages (fn [pages]
                                         (vec (take 10 (conj pages page)))))
   (reset! cache {:timestamp (js/Date.)})
-  
+
   (when (get (methods pager-base) (first page))
     (let [hooks (apply pager-base core page)
           {:keys [on-load-hook]} hooks]
@@ -39,6 +39,20 @@
                                             :history-pages []}))]
     (partial pager-base core)))
 
+(defmethod do-base :change-page
+  [{:keys [pager]} _ page]
+  (pager :change-page {:page page}))
+
+;; nav 
+
+(defmethod nav-base :default
+  [{:keys [pager]} method & args]
+  (println (concat [method] args))
+  (pager :change-page {:page (concat [method] args)}))
+
+(defmethod ig/init-key :fancoil.units/nav
+  [_ config]
+  (partial nav-base config))
 
 ;; mounter
 

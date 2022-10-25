@@ -70,3 +70,6 @@
 
 (defmulti pager-base
   (fn [core method & args] method))
+
+(defmulti nav-base
+  (fn [core method & args] method))

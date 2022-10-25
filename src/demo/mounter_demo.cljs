@@ -16,29 +16,30 @@
 ;; view
 
 (defmethod fb/view-base :app/home-page
-  [{:keys [pager]} _ props]
+  [{:keys [nav]} _ props]
   [:div
    "this is home-page"
    [:div (str props)]
    [:div
-    [:div [:button {:on-click #(pager :change-page {:page [:app/item-page {:id 1}]})}
+    [:div [:button {:on-click #(nav :app/item-page {:id 1})}
            "navigate to item1"]]
-    [:div [:button {:on-click #(pager :change-page {:page [:app/item-page {:id 2}]})}
+    [:div [:button {:on-click #(nav :app/item-page {:id 2})}
            "navigate to item2"]]
-    [:div [:button {:on-click #(pager :change-page {:page [:app/input-page ]})}
+    [:div [:button {:on-click #(nav :app/input-page {})}
            "navigate to input page"]]]])
 
 
 (defmethod fb/view-base :app/item-page
-  [{:keys [pager cache]} _ props]
+  [{:keys [nav cache]} _ props]
   [:div
    "this is item-page" (str props)
    [:p (str @cache)]
-   [:div 
-    [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]])
+   [:div
+    [:button {:on-click #(nav :app/home-page)} "home page"]]])
+
 
 (defmethod fb/view-base :app/input-page
-  [{:keys [pager cache ratom]} _ _]
+  [{:keys [nav cache ratom]} _ _]
   (let [value (:value @cache)]
     [:div
      [:p (str @cache)]
@@ -49,8 +50,7 @@
                              (swap! ratom assoc :value new-value)))}]
      [:p "current value: " value]
      [:div
-      [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]]
-    ))
+      [:button {:on-click #(nav :app/home-page)} "home page"]]]))
 
 ;; integrant
 
@@ -68,7 +68,8 @@
    ::dispatch [::fu/dispatch]
    ::service [::fu/service]
    ::mounter [::fu/mounter]
-   ::pager [::fu/pager]})
+   ::pager [::fu/pager]
+   ::nav [::fu/nav]})
 
 
 (fs/load-hierarchy hierarchy)
@@ -77,7 +78,8 @@
   {::schema {}
    ::ratom {}
    ::cache {}
-   ::do! {:dispatch (ig/ref ::dispatch)}
+   ::do! {:dispatch (ig/ref ::dispatch)
+          :pager (ig/ref ::pager)}
    ::model {}
    ::handle {:model (ig/ref ::model)
              :ratom (ig/ref ::ratom)
@@ -85,9 +87,10 @@
    ::process {:handle (ig/ref ::handle)
               :do! (ig/ref ::do!)}
    ::view {:dispatch (ig/ref ::dispatch)
+           :pager (ig/ref ::pager)
+           :nav (ig/ref ::nav)
            :cache (ig/ref ::cache)
-           :ratom (ig/ref ::ratom)
-           :pager (ig/ref ::pager)}
+           :ratom (ig/ref ::ratom)}
    ::chan {}
    ::dispatch {:out-chan (ig/ref ::chan)}
    ::service {:process (ig/ref ::process)
@@ -96,10 +99,10 @@
             :cache (ig/ref ::cache)
             :ratom (ig/ref ::ratom)
             :dispatch (ig/ref ::dispatch)}
+   ::nav {:pager (ig/ref ::pager)}
    ::mounter {:pager (ig/ref ::pager)
               :dom-id "app"
-              :view (ig/ref ::view)}
-    })
+              :view (ig/ref ::view)}})
 
 
 (defonce sys
@@ -128,6 +131,5 @@
 
 
 
-(comment 
-  (sys ::pager :get-state)
-  )
+(comment
+  (sys ::pager :get-state))
