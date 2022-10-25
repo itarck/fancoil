@@ -6,7 +6,7 @@
    [integrant.core :as ig]))
 
 
-;; pager: 
+;; pager
 
 
 (defmethod pager-base :get-state
@@ -19,7 +19,7 @@
 
 
 (defmethod pager-base :change-page
-  [{:keys [state* cache dispatch] :as core} _ {:keys [page]}]
+  [{:keys [state* cache] :as core} _ {:keys [page]}]
   (swap! state* assoc :current-page page)
   (swap! state* update :history-pages (fn [pages]
                                         (vec (take 10 (conj pages page)))))
@@ -27,18 +27,16 @@
   
   (when (get (methods pager-base) (first page))
     (let [hooks (apply pager-base core page)
-          {:keys [on-load]} hooks]
-      (when on-load
-        (apply dispatch on-load)))))
+          {:keys [on-load-hook]} hooks]
+      (when on-load-hook
+        (on-load-hook)))))
 
 
 (defmethod ig/init-key :fancoil.units/pager
   [_ config]
-  (let [{:keys [initial-page dispatch cache]} config
-        core {:state* (r/atom {:current-page initial-page
-                               :history-pages []})
-              :dispatch dispatch
-              :cache cache}]
+  (let [{:keys [initial-page]} config
+        core (assoc config :state* (r/atom {:current-page initial-page
+                                            :history-pages []}))]
     (partial pager-base core)))
 
 

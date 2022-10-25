@@ -10,8 +10,8 @@
 ;; pager 
 
 (defmethod fb/pager-base :app/input-page
-  [_ _]
-  {:on-load [:app.input-page/on-load]})
+  [{:keys [ratom cache]} _]
+  {:on-load-hook #(swap! cache assoc :value (:value @ratom))})
 
 ;; view
 
@@ -52,28 +52,17 @@
       [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]]
     ))
 
-
-;; handle 
-
-(defmethod fb/handle-base :app.input-page/on-load
-  [{:keys [ratom cache]} _]
-  (swap! cache assoc :value (:value @ratom))
-  )
-
 ;; integrant
 
 
 (def hierarchy
-  {::pconn [::fu/pconn]
-   ::ratom [::fu/ratom]
+  {::ratom [::fu/ratom]
    ::cache [::fu/ratom]
    ::schema [::fu/schema]
-   ::inject [::fu/inject]
    ::do! [::fu/do!]
    ::model [::fu/model]
    ::handle [::fu/handle]
    ::process [::fu/process]
-   ::subscribe [::fu/subscribe]
    ::view [::fu/view]
    ::chan [::fu/chan]
    ::dispatch [::fu/dispatch]
@@ -87,24 +76,15 @@
 (def config
   {::schema {}
    ::ratom {}
-   ::pconn {:schema (ig/ref ::schema)
-            :initial-tx []}
    ::cache {}
-   ::inject {:pconn (ig/ref ::pconn)}
-   ::do! {:dispatch (ig/ref ::dispatch)
-          :subscribe (ig/ref ::subscribe)
-          :pconn (ig/ref ::pconn)}
+   ::do! {:dispatch (ig/ref ::dispatch)}
    ::model {}
-   ::handle {:subscribe (ig/ref ::subscribe)
-             :model (ig/ref ::model)
+   ::handle {:model (ig/ref ::model)
              :ratom (ig/ref ::ratom)
              :cache (ig/ref ::cache)}
    ::process {:handle (ig/ref ::handle)
-              :inject (ig/ref ::inject)
               :do! (ig/ref ::do!)}
-   ::subscribe {:pconn (ig/ref ::pconn)}
    ::view {:dispatch (ig/ref ::dispatch)
-           :subscribe (ig/ref ::subscribe)
            :cache (ig/ref ::cache)
            :ratom (ig/ref ::ratom)
            :pager (ig/ref ::pager)}
@@ -114,6 +94,7 @@
               :in-chan (ig/ref ::chan)}
    ::pager {:initial-page [:app/home-page]
             :cache (ig/ref ::cache)
+            :ratom (ig/ref ::ratom)
             :dispatch (ig/ref ::dispatch)}
    ::mounter {:pager (ig/ref ::pager)
               :dom-id "app"
@@ -124,9 +105,6 @@
 (defonce sys
   (let [core (ig/init config)]
     (fs/create-instance fs/system-base core)))
-
-(defonce subscribe
-  (sys ::subscribe))
 
 (defonce handle
   (sys ::handle))

@@ -369,8 +369,9 @@
   ;; (println "in process default" method args)
   (let [handle-mathods (methods handle-base)]
     (if (contains? handle-mathods method)
-      (let [req' (first args)
-            req (inject :inject-all req')
+      (let [req (if inject
+                  (inject :inject-all (first args))
+                  (first args))
             effect (handle method req)]
         (doseq [action effect]
           (if (contains? handle-mathods (first action))
