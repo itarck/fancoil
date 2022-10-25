@@ -1,81 +1,81 @@
-(ns fancoil.modules.mounter
+(ns fancoil.modules.mount
   (:require
    [reagent.core :as r]
    [reagent.dom :as rdom]
-   [fancoil.base :as b :refer [pager-base do-base nav-base]]
+   [fancoil.base :as b :refer [page-base do-base nav-base]]
    [integrant.core :as ig]))
 
 
-;; pager
+;; page
 
 
-(defmethod pager-base :get-state
+(defmethod page-base :get-state
   [{:keys [state*]} _]
   state*)
 
-(defmethod pager-base :cursor-current-page
+(defmethod page-base :cursor-current-page
   [{:keys [state*]} _]
   (r/cursor state* [:current-page]))
 
 
-(defmethod pager-base :change-page
+(defmethod page-base :change-page
   [{:keys [state* cache] :as core} _ {:keys [page]}]
   (swap! state* assoc :current-page page)
   (swap! state* update :history-pages (fn [pages]
                                         (vec (take 10 (conj pages page)))))
   (reset! cache {:timestamp (js/Date.)})
 
-  (when (get (methods pager-base) (first page))
-    (let [hooks (apply pager-base core page)
+  (when (get (methods page-base) (first page))
+    (let [hooks (apply page-base core page)
           {:keys [on-load-hook]} hooks]
       (when on-load-hook
         (on-load-hook)))))
 
 
-(defmethod ig/init-key :fancoil.units/pager
+(defmethod ig/init-key :fancoil.units/page
   [_ config]
   (let [{:keys [initial-page]} config
         core (assoc config :state* (r/atom {:current-page initial-page
                                             :history-pages []}))]
-    (partial pager-base core)))
+    (partial page-base core)))
 
 (defmethod do-base :change-page
-  [{:keys [pager]} _ page]
-  (pager :change-page {:page page}))
+  [{:keys [page]} _ page]
+  (page :change-page {:page page}))
 
 ;; nav 
 
 (defmethod nav-base :default
-  [{:keys [pager]} method & args]
+  [{:keys [page]} method & args]
   (println (concat [method] args))
-  (pager :change-page {:page (concat [method] args)}))
+  (page :change-page {:page (concat [method] args)}))
 
 (defmethod ig/init-key :fancoil.units/nav
   [_ config]
   (partial nav-base config))
 
-;; mounter
+;; mount
 
-(defmulti mounter-base
+(defmulti mount-base
   (fn [core method & args] method))
 
-(defmethod mounter-base :root-page
-  [{:keys [view pager]} _]
+(defmethod mount-base :root-page
+  [{:keys [view page]} _]
   (fn []
-    (let [page @(pager :cursor-current-page)]
+    (let [page @(page :cursor-current-page)]
       (vec (concat [view] page)))))
 
-(defmethod mounter-base :mount!
+(defmethod mount-base :mount!
   [{:keys [dom-id] :as core} _]
   (rdom/render
-   [(mounter-base core :root-page)]
+   [(mount-base core :root-page)]
    (.getElementById js/document dom-id)))
 
 
-(defmethod ig/init-key :fancoil.units/mounter
+(defmethod ig/init-key :fancoil.units/mount
   [_ config]
-  (let [mounter-unit (partial mounter-base config)]
-    (mounter-unit :mount!)
-    mounter-unit))
+  (let [mount-unit (partial mount-base config)]
+    (mount-unit :mount!)
+    mount-unit))
 
 

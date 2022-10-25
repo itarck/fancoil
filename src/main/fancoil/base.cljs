@@ -68,7 +68,7 @@
   (fn [core method & args] method))
 
 
-(defmulti pager-base
+(defmulti page-base
   (fn [core method & args] method))
 
 (defmulti nav-base

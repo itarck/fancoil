@@ -1,15 +1,15 @@
-(ns mounter-demo
+(ns mount-demo
   (:require
    [applied-science.js-interop :as j]
    [integrant.core :as ig]
    [fancoil.base :as fb]
    [fancoil.units :as fu]
    [fancoil.system :as fs]
-   [fancoil.modules.mounter]))
+   [fancoil.modules.mount]))
 
-;; pager 
+;; page 
 
-(defmethod fb/pager-base :app/input-page
+(defmethod fb/page-base :app/input-page
   [{:keys [ratom cache]} _]
   {:on-load-hook #(swap! cache assoc :value (:value @ratom))})
 
@@ -67,8 +67,8 @@
    ::chan [::fu/chan]
    ::dispatch [::fu/dispatch]
    ::service [::fu/service]
-   ::mounter [::fu/mounter]
-   ::pager [::fu/pager]
+   ::mount [::fu/mount]
+   ::page [::fu/page]
    ::nav [::fu/nav]})
 
 
@@ -79,7 +79,7 @@
    ::ratom {}
    ::cache {}
    ::do! {:dispatch (ig/ref ::dispatch)
-          :pager (ig/ref ::pager)}
+          :page (ig/ref ::page)}
    ::model {}
    ::handle {:model (ig/ref ::model)
              :ratom (ig/ref ::ratom)
@@ -87,7 +87,7 @@
    ::process {:handle (ig/ref ::handle)
               :do! (ig/ref ::do!)}
    ::view {:dispatch (ig/ref ::dispatch)
-           :pager (ig/ref ::pager)
+           :page (ig/ref ::page)
            :nav (ig/ref ::nav)
            :cache (ig/ref ::cache)
            :ratom (ig/ref ::ratom)}
@@ -95,12 +95,12 @@
    ::dispatch {:out-chan (ig/ref ::chan)}
    ::service {:process (ig/ref ::process)
               :in-chan (ig/ref ::chan)}
-   ::pager {:initial-page [:app/home-page]
+   ::page {:initial-page [:app/home-page]
             :cache (ig/ref ::cache)
             :ratom (ig/ref ::ratom)
             :dispatch (ig/ref ::dispatch)}
-   ::nav {:pager (ig/ref ::pager)}
-   ::mounter {:pager (ig/ref ::pager)
+   ::nav {:page (ig/ref ::page)}
+   ::mount {:page (ig/ref ::page)
               :dom-id "app"
               :view (ig/ref ::view)}})
 
@@ -120,7 +120,7 @@
 
 
 (defn mount-root []
-  (sys ::mounter :mount!))
+  (sys ::mount :mount!))
 
 (defn dev-init!
   [])
@@ -132,4 +132,4 @@
 
 
 (comment
-  (sys ::pager :get-state))
+  (sys ::page :get-state))
