@@ -66,3 +66,7 @@
 (defmulti component-base 
   "view component"
   (fn [core method & args] method))
+
+
+(defmulti pager-base
+  (fn [core method & args] method))

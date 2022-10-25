@@ -2,14 +2,12 @@
   (:require
    [reagent.core :as r]
    [reagent.dom :as rdom]
-   [fancoil.base :as b]
+   [fancoil.base :as b :refer [pager-base]]
    [integrant.core :as ig]))
 
 
 ;; pager: 
 
-(defmulti pager-base
-  (fn [core method & args] method))
 
 (defmethod pager-base :get-state
   [{:keys [state*]} _]
@@ -19,24 +17,28 @@
   [{:keys [state*]} _]
   (r/cursor state* [:current-page]))
 
-(defmethod pager-base :cursor-cache
-  [{:keys [state*]} _]
-  (r/cursor state* [:cache]))
 
 (defmethod pager-base :change-page
-  [{:keys [state*]} _ {:keys [page]}]
+  [{:keys [state* cache dispatch] :as core} _ {:keys [page]}]
   (swap! state* assoc :current-page page)
-  (swap! state* assoc :cache {:timestamp (js/Date.)})
-  (swap! state* update :history-pages (fn [pages] 
-                                        (vec (take 10 (conj pages page))))))
+  (swap! state* update :history-pages (fn [pages]
+                                        (vec (take 10 (conj pages page)))))
+  (reset! cache {:timestamp (js/Date.)})
+  
+  (when (get (methods pager-base) (first page))
+    (let [hooks (apply pager-base core page)
+          {:keys [on-load]} hooks]
+      (when on-load
+        (apply dispatch on-load)))))
 
 
 (defmethod ig/init-key :fancoil.units/pager
   [_ config]
-  (let [{:keys [initial-page]} config
+  (let [{:keys [initial-page dispatch cache]} config
         core {:state* (r/atom {:current-page initial-page
-                               :history-pages []
-                               :cache {}})}]
+                               :history-pages []})
+              :dispatch dispatch
+              :cache cache}]
     (partial pager-base core)))
 
 

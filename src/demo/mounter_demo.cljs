@@ -7,6 +7,12 @@
    [fancoil.system :as fs]
    [fancoil.modules.mounter]))
 
+;; pager 
+
+(defmethod fb/pager-base :app/input-page
+  [_ _]
+  {:on-load [:app.input-page/on-load]})
+
 ;; view
 
 (defmethod fb/view-base :app/home-page
@@ -24,32 +30,43 @@
 
 
 (defmethod fb/view-base :app/item-page
-  [{:keys [pager]} _ props]
+  [{:keys [pager cache]} _ props]
   [:div
    "this is item-page" (str props)
+   [:p (str @cache)]
    [:div 
     [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]])
 
 (defmethod fb/view-base :app/input-page
-  [{:keys [pager]} _ _]
-  (let [cache* (pager :cursor-cache)
-        value (:value @cache*)]
+  [{:keys [pager cache ratom]} _ _]
+  (let [value (:value @cache)]
     [:div
-     [:p (str @cache*)]
+     [:p (str @cache)]
      [:input {:value value
               :on-change (fn [e]
                            (let [new-value (j/get-in e [:target :value])]
-                             (swap! cache* assoc :value new-value)))}]
+                             (swap! cache assoc :value new-value)
+                             (swap! ratom assoc :value new-value)))}]
      [:p "current value: " value]
      [:div
       [:button {:on-click #(pager :change-page {:page [:app/home-page]})} "home page"]]]
     ))
+
+
+;; handle 
+
+(defmethod fb/handle-base :app.input-page/on-load
+  [{:keys [ratom cache]} _]
+  (swap! cache assoc :value (:value @ratom))
+  )
 
 ;; integrant
 
 
 (def hierarchy
   {::pconn [::fu/pconn]
+   ::ratom [::fu/ratom]
+   ::cache [::fu/ratom]
    ::schema [::fu/schema]
    ::inject [::fu/inject]
    ::do! [::fu/do!]
@@ -69,27 +86,35 @@
 
 (def config
   {::schema {}
+   ::ratom {}
    ::pconn {:schema (ig/ref ::schema)
             :initial-tx []}
+   ::cache {}
    ::inject {:pconn (ig/ref ::pconn)}
    ::do! {:dispatch (ig/ref ::dispatch)
           :subscribe (ig/ref ::subscribe)
           :pconn (ig/ref ::pconn)}
    ::model {}
    ::handle {:subscribe (ig/ref ::subscribe)
-             :model (ig/ref ::model)}
+             :model (ig/ref ::model)
+             :ratom (ig/ref ::ratom)
+             :cache (ig/ref ::cache)}
    ::process {:handle (ig/ref ::handle)
               :inject (ig/ref ::inject)
               :do! (ig/ref ::do!)}
    ::subscribe {:pconn (ig/ref ::pconn)}
    ::view {:dispatch (ig/ref ::dispatch)
            :subscribe (ig/ref ::subscribe)
+           :cache (ig/ref ::cache)
+           :ratom (ig/ref ::ratom)
            :pager (ig/ref ::pager)}
    ::chan {}
    ::dispatch {:out-chan (ig/ref ::chan)}
    ::service {:process (ig/ref ::process)
               :in-chan (ig/ref ::chan)}
-   ::pager {:initial-page [:app/home-page]}
+   ::pager {:initial-page [:app/home-page]
+            :cache (ig/ref ::cache)
+            :dispatch (ig/ref ::dispatch)}
    ::mounter {:pager (ig/ref ::pager)
               :dom-id "app"
               :view (ig/ref ::view)}
