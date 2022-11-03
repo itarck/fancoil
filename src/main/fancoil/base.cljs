@@ -36,6 +36,10 @@
    "
   (fn [core method & args] method))
 
+(defmulti read-base
+  "read db conn or ratom"
+  (fn [core method & args] method))
+
 (defmulti handle-base
   "pure function: handle a request
    request in -> response out

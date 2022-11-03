@@ -1,7 +1,7 @@
 (ns fancoil.units
   (:require
    [fancoil.base :refer [spec-base schema-base subscribe-base view-base 
-                         inject-base model-base handle-base do-base
+                         inject-base model-base read-base handle-base do-base
                          process-base schedule-base component-base]]
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [cljs.spec.alpha :as s]
@@ -252,25 +252,6 @@
 ;; ------------------------------------------------
 ;; model
 
-(defmethod model-base :db
-  [{:keys [pconn]} _method]
-  @pconn)
-
-(defmethod model-base :pull
-  [core _ {:keys [selector id] :or {selector '[*]}}]
-  (let [db (model-base core :db)]
-    (d/pull db selector id)))
-
-(defmethod model-base :pull-many
-  [core _ {:keys [selector ids] :or {selector '[*]}}]
-  (let [db (model-base core :db)]
-    (mapv (fn [id] (d/pull db selector id)) ids)))
-
-(defmethod model-base :q
-  [core _ {:keys [query inputs]}]
-  (let [db (model-base core :db)]
-    (apply d/q query (concat [db] inputs))))
-
 (defn create-model-instance
   [config]
   (fn model [method & args]
@@ -280,6 +261,38 @@
 (defmethod ig/init-key ::model
   [_ config]
   (create-model-instance config))
+
+;; ------------------------------------------------
+;; read
+
+(defmethod read-base :db
+  [{:keys [pconn]} _method]
+  @pconn)
+
+(defmethod read-base :pull
+  [core _ {:keys [selector id] :or {selector '[*]}}]
+  (let [db (read-base core :db)]
+    (d/pull db selector id)))
+
+(defmethod read-base :pull-many
+  [core _ {:keys [selector ids] :or {selector '[*]}}]
+  (let [db (read-base core :db)]
+    (mapv (fn [id] (d/pull db selector id)) ids)))
+
+(defmethod read-base :q
+  [core _ {:keys [query inputs]}]
+  (let [db (read-base core :db)]
+    (apply d/q query (concat [db] inputs))))
+
+(defn create-read-instance
+  [config]
+  (fn read [method & args]
+    (let [core (assoc config :read read)]
+      (apply read-base core method args))))
+
+(defmethod ig/init-key ::read
+  [_ config]
+  (create-read-instance config))
 
 ;; ------------------------------------------------
 ;; handle
