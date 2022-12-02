@@ -77,3 +77,24 @@
 
 (defmulti nav-base
   (fn [core method & args] method))
+
+
+(defn reg
+  [fn-type fn-method function]
+  (cond
+    (= fn-type :subscribe) (defmethod subscribe-base fn-method
+                             [core _ & args]
+                             (apply function core args))
+    (= fn-type :view) (defmethod view-base fn-method
+                        [core _ & args]
+                        (apply function core args))
+    (= fn-type :handle) (defmethod handle-base fn-method
+                          [core _ & args]
+                          (apply function core args))
+    (= fn-type :component) (defmethod component-base fn-method
+                             [core _ & args]
+                             (apply function core args))
+    (= fn-type :model) (defmethod model-base fn-method
+                         [core _ & args]
+                         (apply function core args))
+    :else (throw (js/Error. "function type error"))))

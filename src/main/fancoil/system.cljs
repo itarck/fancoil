@@ -41,6 +41,9 @@
     (= fn-type :component) (defmethod b/component-base fn-method
                           [core _ & args]
                           (apply function core args))
+    (= fn-type :model) (defmethod b/model-base fn-method
+                             [core _ & args]
+                             (apply function core args))
     :else (throw (js/Error. "function type error"))))
 
 ;; ------------------------------------------------
