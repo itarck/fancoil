@@ -1,13 +1,16 @@
 (ns fancoil.units
   (:require
-   [fancoil.base :refer [spec-base schema-base subscribe-base view-base 
+   [fancoil.base :refer [spec-base schema-base subscribe-base view-base
                          inject-base model-base read-base handle-base do-base
                          process-base schedule-base component-base]]
+   [ajax.core :as ajax]
    [cljs.core.async :refer [go go-loop >! <! chan]]
    [cljs.spec.alpha :as s]
    [cljs.pprint :refer [pprint]]
    [datascript.core :as d]
+   [datascript.transit :as dt]
    [integrant.core :as ig]
+   [promesa.core :as pro]
    [posh.reagent :as p]
    [medley.core :as m]
    [reagent.core :as r]
@@ -142,7 +145,7 @@
   (apply p/q query (concat [pconn] inputs)))
 
 (s/def ::subscribe.config map?)
-(s/def ::subscribe.output (fn [t] (or 
+(s/def ::subscribe.output (fn [t] (or
                                    (= cljs.core/Atom (type t))
                                    (= ra/Reaction (type t))
                                    (= ra/RCursor (type t)))))
@@ -193,7 +196,7 @@
         (catch js/Object e (println "error in view unit: " e))))))
 
 (defmethod ig/init-key ::view
-  [_ config] 
+  [_ config]
   (create-view-instance config))
 
 ;; ------------------------------------------------
@@ -224,9 +227,9 @@
 (defmethod inject-base :inject-all
   [{:keys [inject-keys] :as core} _ request]
   (if (seq inject-keys)
-   (reduce (fn [req k]
-            (inject-base core k req))
-          request inject-keys)
+    (reduce (fn [req k]
+              (inject-base core k req))
+            request inject-keys)
     request))
 
 (defmethod inject-base :posh-db
@@ -359,6 +362,43 @@
   [{:keys [ratom]} _ {:keys [path]}]
   (let [cursor (r/cursor ratom path)]
     (reset! cursor nil)))
+
+
+(defmethod do-base :fx.posh/tx
+  [{:keys [pconn]} _ tx]
+  (pro/let [tx' tx]
+    (p/transact! pconn tx')))
+
+(defmethod do-base :fx.posh/reset-conn-from-transit-str
+  [{:keys [pconn]} _ props]
+  (pro/let [{:keys [transit-str]} props]
+    (when transit-str
+      (let [db (dt/read-transit-str transit-str)]
+        (d/reset-conn! pconn db)))))
+
+(defmethod do-base :fx.posh/listen
+  [{:keys [pconn]} _ props]
+  (pro/let [{:keys [key callback]} props]
+    (d/listen! pconn key callback)))
+
+   
+(defmethod do-base :fx.ajax/get
+  [_ _ props]
+  (pro/let [{:keys [url] :as props'} props]
+    (pro/create (fn [resolve reject]
+                (ajax/GET url (merge props'
+                                     {:handler resolve
+                                      :error-handler reject}))))))
+
+(defmethod do-base :fx.ajax/post
+  [_ _ props]
+  (pro/let [{:keys [url] :as props'} props]
+    (pro/create (fn [resolve reject]
+                (ajax/POST url (merge props'
+                                      {:handler resolve
+                                       :error-handler reject}))))))
+   
+
 
 (defn create-do-instance
   [config]
